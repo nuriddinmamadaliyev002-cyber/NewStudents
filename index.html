@@ -25,9 +25,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .field-label{display:block;font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
 .field-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);transition:border-color .15s,box-shadow .15s;outline:none;}
 .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:#fff;}
+.field-input.error{border-color:var(--danger);}
 .field-group{margin-bottom:18px;}
+.field-hint{font-size:11px;color:var(--muted);margin-top:4px;}
 
-/* PASSWORD WRAPPER */
+/* PASSWORD */
 .password-wrapper{position:relative;display:flex;align-items:center;}
 .password-wrapper .field-input{padding-right:42px;}
 .toggle-eye{position:absolute;right:12px;background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s;border-radius:6px;}
@@ -52,14 +54,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-logout:hover{color:var(--danger);border-color:var(--danger);}
 
 /* TABS */
-.tabs{display:flex;gap:4px;padding:24px 24px 0;max-width:1100px;margin:0 auto;}
+.tabs{display:flex;gap:4px;padding:24px 24px 0;max-width:1200px;margin:0 auto;}
 .tab-btn{padding:8px 18px;border:1.5px solid var(--border);background:var(--surface);border-radius:8px 8px 0 0;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;}
 .tab-btn.active{background:var(--accent);border-color:var(--accent);color:white;}
 
-.main{max-width:1100px;margin:0 auto;padding:0 24px 32px;}
+.main{max-width:1200px;margin:0 auto;padding:0 24px 32px;}
 
 /* CARDS */
-.form-card,.table-card,.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:0 14px 14px 14px;margin-bottom:0;box-shadow:var(--shadow);}
+.form-card,.table-card,.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:0 14px 14px 14px;box-shadow:var(--shadow);}
 .form-card{padding:28px 32px;margin-bottom:24px;border-radius:14px;}
 .table-card{overflow:hidden;}
 .admin-card{padding:28px 32px;}
@@ -71,7 +73,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-submit{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:var(--accent);color:white;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;margin-top:8px;}
 .btn-submit:hover{background:#1d4ed8;}
 .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
-.btn-danger{background:var(--danger);}.btn-danger:hover{background:#b91c1c;}
 
 .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;display:none;}
 
@@ -82,13 +83,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .search-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:all .15s;}
 .search-input:focus{border-color:var(--accent);background:white;}
 table{width:100%;border-collapse:collapse;}
-thead th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);}
+thead th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg);}
 tbody td{padding:12px 14px;font-size:13px;color:var(--text);}
 .mono{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
 .sinf-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:500;background:var(--accent-soft);color:var(--accent);}
+.maktab-badge{display:inline-block;padding:2px 10px;border-radius:6px;font-size:13px;font-weight:600;font-family:'DM Mono',monospace;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
 .empty-state{text-align:center;padding:56px 24px;color:var(--muted);}
 .empty-state-icon{font-size:32px;margin-bottom:12px;}
 
@@ -102,12 +104,8 @@ tbody td{padding:12px 14px;font-size:13px;color:var(--text);}
 .btn-small{padding:5px 12px;font-size:12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;background:none;color:var(--danger);border-color:var(--danger);transition:all .15s;}
 .btn-small:hover{background:var(--danger);color:white;}
 
-/* CREATE ADMIN FORM */
-.create-admin-form{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;}
 .create-admin-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
 @media(max-width:700px){.create-admin-grid{grid-template-columns:1fr 1fr;}}
-
-/* DIVIDER */
 .divider{height:1px;background:var(--border);margin:24px 0;}
 
 /* TOAST */
@@ -116,22 +114,26 @@ tbody td{padding:12px 14px;font-size:13px;color:var(--text);}
 .toast.success{background:var(--success);}
 .toast.error{background:var(--danger);}
 
-/* LOADING OVERLAY */
+/* LOADING */
 .loading-overlay{position:fixed;inset:0;background:rgba(245,244,240,.8);display:flex;align-items:center;justify-content:center;z-index:200;display:none;}
 .loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
 
 select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7870' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
 
+/* Number input - hide arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ACTION BUTTONS */
-.btn-action{padding:4px 8px;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:opacity .15s;background:var(--bg);border:1px solid var(--border);}
+.btn-action{padding:4px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:opacity .15s;background:var(--bg);}
 .btn-action:hover{opacity:.7;}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:300;padding:24px;}
-.modal{background:var(--surface);border-radius:16px;padding:32px;width:100%;max-width:480px;box-shadow:0 8px 40px rgba(0,0,0,.15);animation:fadeUp .25s ease;}
+.modal{background:var(--surface);border-radius:16px;padding:32px;width:100%;max-width:520px;box-shadow:0 8px 40px rgba(0,0,0,.15);animation:fadeUp .25s ease;}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:20px;}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 .btn-cancel{padding:9px 18px;border:1.5px solid var(--border);background:none;border-radius:var(--radius);font-family:"DM Sans",sans-serif;font-size:13px;cursor:pointer;color:var(--muted);}
@@ -140,7 +142,7 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ══════════════════ LOGIN ══════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">InnovateIT School</div>
@@ -154,9 +156,8 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       <label class="field-label">Parol</label>
       <div class="password-wrapper">
         <input class="field-input" type="password" id="inp-parol" placeholder="••••••••">
-        <button class="toggle-eye" type="button" onclick="togglePassword('inp-parol', this)" tabindex="-1" aria-label="Parolni ko'rsat/yashir">
-          <!-- Ko'z YOPIQ (default) -->
-          <svg id="eye-icon-inp-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="toggle-eye" type="button" onclick="togglePw('inp-parol')" tabindex="-1">
+          <svg id="eye-inp-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
             <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
             <line x1="1" y1="1" x2="23" y2="23"/>
@@ -165,11 +166,11 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       </div>
     </div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Kirish</button>
-    <p class="error-msg" id="login-error">❌ Login yoki parol noto'g'ri</p>
+    <p class="error-msg" id="login-error"></p>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ══════════════════ APP ══════════════════ -->
 <div id="app">
   <div class="topbar">
     <div class="topbar-brand">InnovateIT School</div>
@@ -180,7 +181,6 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
     </div>
   </div>
 
-  <!-- TABS (faqat super admin uchun) -->
   <div class="tabs" id="tabs-row" style="display:none;">
     <button class="tab-btn active" onclick="switchTab('oquvchilar')">📋 O'quvchilar</button>
     <button class="tab-btn" onclick="switchTab('adminlar')">👥 Adminlar</button>
@@ -188,11 +188,12 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 
   <div class="main">
 
-    <!-- O'QUVCHILAR TAB -->
+    <!-- ── O'QUVCHILAR TAB ── -->
     <div id="tab-oquvchilar">
       <div class="form-card" style="margin-top:24px;">
         <div class="card-title">➕ Yangi o'quvchi qo'shish</div>
         <div class="form-grid">
+
           <div class="field-group">
             <label class="field-label">Ism</label>
             <input class="field-input" id="f-ism" placeholder="Sardor">
@@ -201,10 +202,34 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
             <label class="field-label">Familiya</label>
             <input class="field-input" id="f-familiya" placeholder="Karimov">
           </div>
+
+          <!-- Maktab — 2 xonali raqam -->
+          <div class="field-group">
+            <label class="field-label">Maktab raqami</label>
+            <input class="field-input" id="f-maktab" type="number" placeholder="01" min="1" max="99"
+              oninput="validateMaktab(this)" style="text-align:center;font-family:'DM Mono',monospace;font-size:18px;font-weight:600;letter-spacing:2px;">
+            <p class="field-hint">Faqat 1–99 oralig'idagi raqam (masalan: 5, 23, 99)</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Sinfi</label>
+            <select class="field-input" id="f-sinf">
+              <option value="">— Tanlang —</option>
+              <option>1-sinf</option><option>2-sinf</option><option>3-sinf</option>
+              <option>4-sinf</option><option>5-sinf</option><option>6-sinf</option>
+              <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
+            </select>
+          </div>
+
           <div class="field-group">
             <label class="field-label">Telefon raqam</label>
             <input class="field-input" type="tel" id="f-telefon" placeholder="+998 90 123 45 67">
           </div>
+          <div class="field-group">
+            <label class="field-label">Qo'shimcha telefon</label>
+            <input class="field-input" type="tel" id="f-telefon2" placeholder="+998 90 123 45 67">
+          </div>
+
           <div class="field-group">
             <label class="field-label">Tug'ilgan sana</label>
             <div style="display:grid;grid-template-columns:80px 1fr 100px;gap:8px;">
@@ -222,27 +247,12 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
             </div>
             <input type="hidden" id="f-tug">
           </div>
-          <div class="field-group">
-            <label class="field-label">Qo'shimcha telefon raqam</label>
-            <input class="field-input" type="tel" id="f-telefon2" placeholder="+998 90 123 45 67">
-          </div>
+
           <div class="field-group">
             <label class="field-label">Yashash manzili</label>
             <input class="field-input" id="f-manzil" placeholder="Toshkent, Chilonzor">
           </div>
-          <div class="field-group">
-            <label class="field-label">Maktabi</label>
-            <input class="field-input" id="f-maktab" placeholder="1-maktab">
-          </div>
-          <div class="field-group">
-            <label class="field-label">Sinfi</label>
-            <select class="field-input" id="f-sinf">
-              <option value="">— Tanlang —</option>
-              <option>1-sinf</option><option>2-sinf</option><option>3-sinf</option>
-              <option>4-sinf</option><option>5-sinf</option><option>6-sinf</option>
-              <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
-            </select>
-          </div>
+
         </div>
         <button class="btn-submit" id="submit-btn" onclick="addStudent()">
           <span class="spinner" id="spinner"></span>
@@ -250,12 +260,13 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
         </button>
       </div>
 
+      <!-- Jadval -->
       <div class="table-card">
         <div class="table-header">
           <div class="table-title">O'quvchilar ro'yxati</div>
           <div class="filters">
             <input class="search-input" id="filter-search" placeholder="Ism, telefon…" oninput="applyFilters()" style="width:160px;">
-            <select class="search-input" id="filter-maktab" onchange="applyFilters()" style="width:140px;">
+            <select class="search-input" id="filter-maktab" onchange="applyFilters()" style="width:130px;">
               <option value="">Barcha maktab</option>
             </select>
             <select class="search-input" id="filter-sinf" onchange="applyFilters()" style="width:120px;">
@@ -266,22 +277,30 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
             </select>
           </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>Ism Familiya</th><th>Telefon raqami</th>
-              <th>Qo'sh. telefon</th><th>Tug'ilgan yili</th><th>Maktabi</th><th>Sinfi</th><th>Yashash manzili</th>
-              <th id="admin-col" style="display:none;">Admin</th>
-              <th>Sana</th>
-              <th>Amal</th>
-            </tr>
-          </thead>
-          <tbody id="student-tbody"></tbody>
-        </table>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Ism Familiya</th>
+                <th>Maktabi</th>
+                <th>Sinfi</th>
+                <th>Telefon</th>
+                <th>Qo'sh. Telefon</th>
+                <th>Tug'ilgan sana</th>
+                <th>Yashash manzili</th>
+                <th id="admin-col" style="display:none;">Admin</th>
+                <th>Qo'shilgan</th>
+                <th>Amal</th>
+              </tr>
+            </thead>
+            <tbody id="student-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- ADMINLAR TAB (faqat super admin) -->
+    <!-- ── ADMINLAR TAB ── -->
     <div id="tab-adminlar" style="display:none;">
       <div class="admin-card" style="margin-top:24px;">
         <div class="card-title">➕ Yangi admin yaratish</div>
@@ -298,8 +317,8 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
             <label class="field-label">Parol</label>
             <div class="password-wrapper">
               <input class="field-input" id="a-parol" type="password" placeholder="Parol123!">
-              <button class="toggle-eye" type="button" onclick="togglePassword('a-parol', this)" tabindex="-1" aria-label="Parolni ko'rsat/yashir">
-                <svg id="eye-icon-a-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button class="toggle-eye" type="button" onclick="togglePw('a-parol')" tabindex="-1">
+                <svg id="eye-a-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
                   <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
                   <line x1="1" y1="1" x2="23" y2="23"/>
@@ -323,25 +342,25 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   </div>
 </div>
 
-<!-- ADMIN EDIT MODAL -->
-<div class="modal-overlay" id="admin-edit-modal" style="display:none;" onclick="closeAdminEditIfOverlay(event)">
+<!-- ── ADMIN EDIT MODAL ── -->
+<div class="modal-overlay" id="admin-edit-modal" style="display:none;" onclick="if(event.target===this)closeAdminEdit()">
   <div class="modal">
     <div class="modal-title">✏️ Adminni tahrirlash</div>
     <div class="form-grid">
       <div class="field-group">
         <label class="field-label">Ism</label>
-        <input class="field-input" id="ae-ism" placeholder="Ali Valiyev">
+        <input class="field-input" id="ae-ism">
       </div>
       <div class="field-group">
         <label class="field-label">Email</label>
-        <input class="field-input" type="email" id="ae-email" placeholder="ali@innovateit.uz">
+        <input class="field-input" type="email" id="ae-email">
       </div>
       <div class="field-group" style="grid-column:1/-1">
         <label class="field-label">Yangi parol</label>
         <div class="password-wrapper">
-          <input class="field-input" type="password" id="ae-parol" placeholder="Yangi parol (bo'sh qoldirsa o'zgarmaydi)">
-          <button class="toggle-eye" type="button" onclick="togglePassword('ae-parol', this)" tabindex="-1">
-            <svg id="eye-icon-ae-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <input class="field-input" type="password" id="ae-parol" placeholder="Bo'sh qoldirsa o'zgarmaydi">
+          <button class="toggle-eye" type="button" onclick="togglePw('ae-parol')" tabindex="-1">
+            <svg id="eye-ae-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
               <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
               <line x1="1" y1="1" x2="23" y2="23"/>
@@ -360,39 +379,28 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   </div>
 </div>
 
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="edit-modal" style="display:none;" onclick="closeEditIfOverlay(event)">
+<!-- ── EDIT STUDENT MODAL ── -->
+<div class="modal-overlay" id="edit-modal" style="display:none;" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
     <div class="modal-title">✏️ O'quvchini tahrirlash</div>
     <div class="form-grid">
       <div class="field-group">
         <label class="field-label">Ism</label>
-        <input class="field-input" id="e-ism" placeholder="Sardor">
+        <input class="field-input" id="e-ism">
       </div>
       <div class="field-group">
         <label class="field-label">Familiya</label>
-        <input class="field-input" id="e-familiya" placeholder="Karimov">
+        <input class="field-input" id="e-familiya">
       </div>
+
+      <!-- Maktab modal -->
       <div class="field-group">
-        <label class="field-label">Telefon</label>
-        <input class="field-input" id="e-telefon" placeholder="+998 90 123 45 67">
+        <label class="field-label">Maktab raqami</label>
+        <input class="field-input" id="e-maktab" type="number" min="1" max="99"
+          oninput="validateMaktab(this)" style="text-align:center;font-family:'DM Mono',monospace;font-size:18px;font-weight:600;letter-spacing:2px;">
+        <p class="field-hint">1–99 oralig'idagi raqam</p>
       </div>
-      <div class="field-group">
-        <label class="field-label">Tug'ilgan sana</label>
-        <input class="field-input" type="date" id="e-tug">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Qo'sh. telefon</label>
-        <input class="field-input" id="e-telefon2">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Yashash manzili</label>
-        <input class="field-input" id="e-manzil">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Maktabi</label>
-        <input class="field-input" id="e-maktab">
-      </div>
+
       <div class="field-group">
         <label class="field-label">Sinfi</label>
         <select class="field-input" id="e-sinf">
@@ -401,6 +409,38 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
           <option>4-sinf</option><option>5-sinf</option><option>6-sinf</option>
           <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
         </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Telefon</label>
+        <input class="field-input" id="e-telefon">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Qo'sh. telefon</label>
+        <input class="field-input" id="e-telefon2">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Tug'ilgan sana</label>
+        <div style="display:grid;grid-template-columns:70px 1fr 90px;gap:6px;">
+          <input class="field-input" id="e-kun" type="number" placeholder="Kun" min="1" max="31" style="text-align:center;">
+          <select class="field-input" id="e-oy">
+            <option value="">— Oy —</option>
+            <option value="01">Yanvar</option><option value="02">Fevral</option>
+            <option value="03">Mart</option><option value="04">Aprel</option>
+            <option value="05">May</option><option value="06">Iyun</option>
+            <option value="07">Iyul</option><option value="08">Avgust</option>
+            <option value="09">Sentabr</option><option value="10">Oktabr</option>
+            <option value="11">Noyabr</option><option value="12">Dekabr</option>
+          </select>
+          <input class="field-input" id="e-yil" type="number" placeholder="Yil" min="2009" max="2019" style="text-align:center;">
+        </div>
+        <input type="hidden" id="e-tug">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Yashash manzili</label>
+        <input class="field-input" id="e-manzil">
       </div>
     </div>
     <div class="modal-footer">
@@ -413,113 +453,101 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   </div>
 </div>
 
-<div class="loading-overlay" id="loading-overlay">
-  <div class="loading-spinner"></div>
-</div>
+<div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ⚠️ Shu yerga o'zingizning Apps Script URL ni qo'ying:
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8qFV81dHH1QPMkFezQENr6S33bn07dLpK_l7fOw1pmHg/exec";
 
 let currentUser = null;
-let students = [];
+let students    = [];
 
-// ─── AUTO LOGIN (localStorage) ───
+// ─── AUTO LOGIN ───
 window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('innovateit_user');
   if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      await showApp();
-    } catch(e) {
-      localStorage.removeItem('innovateit_user');
-    }
+    try { currentUser = JSON.parse(saved); await showApp(); }
+    catch(e) { localStorage.removeItem('innovateit_user'); }
   }
 });
 
+// ─── MAKTAB VALIDATSIYA: faqat 1-99 ───
+function validateMaktab(inp) {
+  // Faqat raqam va max 2 ta belgi
+  let v = inp.value.replace(/\D/g, '');
+  if (v.length > 2) v = v.slice(0, 2);
+  inp.value = v;
+  const n = parseInt(v);
+  if (v && (isNaN(n) || n < 1 || n > 99)) {
+    inp.classList.add('error');
+  } else {
+    inp.classList.remove('error');
+  }
+}
 
-// ─── SHOW / HIDE PASSWORD ───
-function togglePassword(inputId, btn) {
-  const input = document.getElementById(inputId);
-  const icon  = document.getElementById('eye-icon-' + inputId);
-  const isHidden = input.type === 'password';
+// Maktab qiymatini formatlash: raqamni string sifatida saqlash
+function getMaktabValue(id) {
+  const v = document.getElementById(id).value.trim();
+  const n = parseInt(v);
+  if (!v || isNaN(n) || n < 1 || n > 99) return null;
+  return String(n); // "5", "23" kabi
+}
 
-  input.type = isHidden ? 'text' : 'password';
-
-  // Ko'z OCHIQ SVG
-  const eyeOpen = `
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>`;
-
-  // Ko'z YOPIQ (chiziq bilan) SVG
-  const eyeClosed = `
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-    <line x1="1" y1="1" x2="23" y2="23"/>`;
-
-  icon.innerHTML = isHidden ? eyeOpen : eyeClosed;
+// ─── PASSWORD TOGGLE ───
+function togglePw(id) {
+  const inp  = document.getElementById(id);
+  const icon = document.getElementById('eye-' + id);
+  const hide = inp.type === 'password';
+  inp.type = hide ? 'text' : 'password';
+  icon.innerHTML = hide
+    ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
+    : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+       <line x1="1" y1="1" x2="23" y2="23"/>`;
 }
 
 // ─── LOGIN ───
-document.getElementById('inp-parol').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
+document.getElementById('inp-parol').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
 async function doLogin() {
   const email = document.getElementById('inp-email').value.trim();
   const parol = document.getElementById('inp-parol').value;
   if (!email || !parol) return;
-
   const btn = document.getElementById('login-btn');
-  btn.disabled = true;
-  btn.textContent = 'Tekshirilmoqda…';
-
+  btn.disabled = true; btn.textContent = 'Tekshirilmoqda…';
   try {
-    const res = await apiPost({ action: 'login', email, parol });
+    const res = await api({ action:'login', email, parol });
     if (res.ok) {
       currentUser = { email, parol, ism: res.ism, isSuper: res.isSuper };
       localStorage.setItem('innovateit_user', JSON.stringify(currentUser));
       showApp();
     } else {
-      document.getElementById('login-error').style.display = 'block';
-      document.getElementById('login-error').textContent = '❌ ' + (res.error || "Login yoki parol noto'g'ri");
+      showErr('login-error', '❌ ' + (res.error || "Login yoki parol noto'g'ri"));
     }
-  } catch(e) {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('login-error').textContent = '❌ Ulanishda xatolik';
-  }
+  } catch(e) { showErr('login-error', '❌ Ulanishda xatolik'); }
+  btn.disabled = false; btn.textContent = 'Kirish';
+}
 
-  btn.disabled = false;
-  btn.textContent = 'Kirish';
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
 }
 
 function doLogout() {
-  currentUser = null;
-  students = [];
+  currentUser = null; students = [];
   localStorage.removeItem('innovateit_user');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('inp-email').value = '';
   document.getElementById('inp-parol').value = '';
   document.getElementById('login-error').style.display = 'none';
-  // Parolni yana yashir
-  const inp = document.getElementById('inp-parol');
-  if (inp.type === 'text') {
-    inp.type = 'password';
-    const icon = document.getElementById('eye-icon-inp-parol');
-    icon.innerHTML = `
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-      <line x1="1" y1="1" x2="23" y2="23"/>`;
-  }
+  document.getElementById('admin-badge-name').classList.remove('super');
 }
 
 // ─── SHOW APP ───
 async function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-
   const badge = document.getElementById('admin-badge-name');
   badge.textContent = currentUser.ism;
   if (currentUser.isSuper) {
@@ -529,16 +557,15 @@ async function showApp() {
     document.getElementById('admin-col').style.display = '';
     loadAdmins();
   }
-
   await loadStudents();
 }
 
 // ─── TABS ───
 function switchTab(tab) {
-  document.getElementById('tab-oquvchilar').style.display = tab === 'oquvchilar' ? 'block' : 'none';
-  document.getElementById('tab-adminlar').style.display = tab === 'adminlar' ? 'block' : 'none';
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', (i === 0 && tab === 'oquvchilar') || (i === 1 && tab === 'adminlar'));
+  document.getElementById('tab-oquvchilar').style.display = tab==='oquvchilar' ? 'block' : 'none';
+  document.getElementById('tab-adminlar').style.display   = tab==='adminlar'   ? 'block' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0&&tab==='oquvchilar')||(i===1&&tab==='adminlar'));
   });
 }
 
@@ -546,19 +573,15 @@ function switchTab(tab) {
 async function loadStudents() {
   showLoading(true);
   try {
-    const url = `${APPS_SCRIPT_URL}?action=getStudents&email=${encodeURIComponent(currentUser.email)}&parol=${encodeURIComponent(currentUser.parol)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await api({ action:'getStudents', email:currentUser.email, parol:currentUser.parol });
     if (data.ok) {
       students = data.students;
-      students.forEach((s, i) => s.rowIndex = i);
+      students.forEach((s,i) => s.rowIndex = i);
       updateMaktabFilter();
       applyFilters();
       updateCount();
     }
-  } catch(e) {
-    showToast('❌ Ma\'lumotlar yuklanmadi', 'error');
-  }
+  } catch(e) { showToast("❌ Ma'lumotlar yuklanmadi", 'error'); }
   showLoading(false);
 }
 
@@ -566,9 +589,14 @@ async function loadStudents() {
 async function addStudent() {
   const ism      = document.getElementById('f-ism').value.trim();
   const familiya = document.getElementById('f-familiya').value.trim();
+  const maktab   = getMaktabValue('f-maktab');
+  const sinf     = document.getElementById('f-sinf').value;
   const telefon  = document.getElementById('f-telefon').value.trim();
-  // Tug'ilgan sanani yig'ish
-  const kun = String(document.getElementById('f-kun').value || '').padStart(2,'0');
+  const telefon2 = document.getElementById('f-telefon2').value.trim();
+  const manzil   = document.getElementById('f-manzil').value.trim();
+
+  // Tug'ilgan sana
+  const kun = String(document.getElementById('f-kun').value||'').padStart(2,'0');
   const oy  = document.getElementById('f-oy').value;
   const yil = document.getElementById('f-yil').value;
   if (yil && (yil < 2009 || yil > 2019)) {
@@ -576,44 +604,33 @@ async function addStudent() {
   }
   if (yil && oy && kun) document.getElementById('f-tug').value = yil+'-'+oy+'-'+kun;
   const tug = document.getElementById('f-tug').value;
-  const maktab   = document.getElementById('f-maktab').value.trim();
-  const sinf     = document.getElementById('f-sinf').value;
 
-  const telefon2 = document.getElementById('f-telefon2').value.trim();
-  const manzil   = document.getElementById('f-manzil').value.trim();
-  if (!ism || !familiya || !telefon || !tug || !maktab || !sinf) {
-    showToast("⚠️ Barcha maydonlarni to'ldiring", 'error');
-    return;
-  }
+  if (!ism || !familiya) { showToast("⚠️ Ism va familiyani kiriting", 'error'); return; }
+  if (!maktab) { showToast("⚠️ Maktab raqamini to'g'ri kiriting (1–99)", 'error'); document.getElementById('f-maktab').classList.add('error'); return; }
+  if (!sinf)   { showToast("⚠️ Sinfni tanlang", 'error'); return; }
+  if (!telefon){ showToast("⚠️ Telefon raqamini kiriting", 'error'); return; }
+  if (!tug)    { showToast("⚠️ Tug'ilgan sanani kiriting", 'error'); return; }
 
   setLoading(true);
   try {
-    const res = await apiPost({
-      action: 'addStudent',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      ism, familiya, telefon, telefon2, manzil, tug, maktab, sinf,
+    const res = await api({
+      action:'addStudent', email:currentUser.email, parol:currentUser.parol,
+      ism, familiya, maktab, sinf, telefon, telefon2, manzil, tug,
       date: new Date().toLocaleDateString('uz-UZ')
     });
     if (res.ok) {
       clearForm();
       await loadStudents();
       showToast("✅ O'quvchi muvaffaqiyatli qo'shildi!", 'success');
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
-  } catch(e) {
-    showToast('❌ Xatolik yuz berdi', 'error');
-  }
+    } else { showToast('❌ ' + res.error, 'error'); }
+  } catch(e) { showToast('❌ Xatolik yuz berdi', 'error'); }
   setLoading(false);
 }
 
-// ─── ADMIN MANAGEMENT ───
+// ─── ADMINS ───
 async function loadAdmins() {
   try {
-    const url = `${APPS_SCRIPT_URL}?action=getAdmins&email=${encodeURIComponent(currentUser.email)}&parol=${encodeURIComponent(currentUser.parol)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await api({ action:'getAdmins', email:currentUser.email, parol:currentUser.parol });
     if (data.ok) renderAdmins(data.admins);
   } catch(e) {}
 }
@@ -629,73 +646,45 @@ function renderAdmins(admins) {
       <div class="admin-info">
         <span class="admin-name">${a.ism}</span>
         <span class="admin-email">${a.email}</span>
-        <span class="admin-parol">🔑 ${a.parol || '—'}</span>
+        <span class="admin-parol">🔑 ${a.parol||'—'}</span>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn-action btn-edit" onclick="openAdminEdit('${a.email}', '${a.ism}', '${a.parol||''}')">✏️ Tahrir</button>
-        <button class="btn-small" onclick="deleteAdmin('${a.email}', '${a.ism}')">O'chirish</button>
+        <button class="btn-action" onclick="openAdminEdit('${a.email}','${a.ism}','${a.parol||''}')">✏️ Tahrir</button>
+        <button class="btn-small" onclick="deleteAdmin('${a.email}','${a.ism}')">O'chirish</button>
       </div>
     </div>`).join('');
 }
 
 async function createAdmin() {
-  const ism   = document.getElementById('a-ism').value.trim();
-  const email = document.getElementById('a-email').value.trim();
-  const parol = document.getElementById('a-parol').value.trim();
-
-  if (!ism || !email || !parol) {
-    showToast("⚠️ Barcha maydonlarni to'ldiring", 'error');
-    return;
-  }
-
-  document.getElementById('aspinner').style.display = 'inline-block';
-  document.getElementById('a-btn-text').textContent = 'Yaratilmoqda…';
-
+  const ism=document.getElementById('a-ism').value.trim();
+  const email=document.getElementById('a-email').value.trim();
+  const parol=document.getElementById('a-parol').value.trim();
+  if (!ism||!email||!parol) { showToast("⚠️ Barcha maydonlarni to'ldiring",'error'); return; }
+  document.getElementById('aspinner').style.display='inline-block';
+  document.getElementById('a-btn-text').textContent='Yaratilmoqda…';
   try {
-    const res = await apiPost({
-      action: 'createAdmin',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      newIsm: ism, newEmail: email, newParol: parol
-    });
+    const res = await api({ action:'createAdmin', email:currentUser.email, parol:currentUser.parol, newIsm:ism, newEmail:email, newParol:parol });
     if (res.ok) {
-      document.getElementById('a-ism').value = '';
-      document.getElementById('a-email').value = '';
-      document.getElementById('a-parol').value = '';
-      showToast('✅ Admin yaratildi!', 'success');
-      loadAdmins();
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
-  } catch(e) {
-    showToast('❌ Xatolik yuz berdi', 'error');
-  }
-
-  document.getElementById('aspinner').style.display = 'none';
-  document.getElementById('a-btn-text').textContent = 'Yaratish';
+      document.getElementById('a-ism').value='';
+      document.getElementById('a-email').value='';
+      document.getElementById('a-parol').value='';
+      showToast('✅ Admin yaratildi!','success'); loadAdmins();
+    } else { showToast('❌ '+res.error,'error'); }
+  } catch(e) { showToast('❌ Xatolik','error'); }
+  document.getElementById('aspinner').style.display='none';
+  document.getElementById('a-btn-text').textContent='Yaratish';
 }
 
 async function deleteAdmin(email, ism) {
   if (!confirm(`"${ism}" adminini o'chirishni tasdiqlaysizmi?`)) return;
   try {
-    const res = await apiPost({
-      action: 'deleteAdmin',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      deleteEmail: email
-    });
-    if (res.ok) {
-      showToast("✅ Admin o'chirildi", 'success');
-      loadAdmins();
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
+    const res = await api({ action:'deleteAdmin', email:currentUser.email, parol:currentUser.parol, deleteEmail:email });
+    if (res.ok) { showToast("✅ Admin o'chirildi",'success'); loadAdmins(); }
+    else showToast('❌ '+res.error,'error');
   } catch(e) {}
 }
 
-// ─── ADMIN EDIT ───
 let editAdminOldEmail = null;
-
 function openAdminEdit(email, ism, parol) {
   editAdminOldEmail = email;
   document.getElementById('ae-ism').value = ism;
@@ -703,62 +692,36 @@ function openAdminEdit(email, ism, parol) {
   document.getElementById('ae-parol').value = '';
   document.getElementById('admin-edit-modal').style.display = 'flex';
 }
-
 function closeAdminEdit() {
   document.getElementById('admin-edit-modal').style.display = 'none';
   editAdminOldEmail = null;
 }
-
-function closeAdminEditIfOverlay(e) {
-  if (e.target === document.getElementById('admin-edit-modal')) closeAdminEdit();
-}
-
 async function saveAdminEdit() {
-  const ism   = document.getElementById('ae-ism').value.trim();
-  const email = document.getElementById('ae-email').value.trim();
-  const parol = document.getElementById('ae-parol').value.trim();
-
-  if (!ism || !email) {
-    showToast("⚠️ Ism va email majburiy", 'error'); return;
-  }
-
-  document.getElementById('admin-edit-spinner').style.display = 'inline-block';
-  document.getElementById('admin-edit-btn-text').textContent = 'Saqlanmoqda…';
-  document.getElementById('admin-edit-save-btn').disabled = true;
-
+  const ism=document.getElementById('ae-ism').value.trim();
+  const email=document.getElementById('ae-email').value.trim();
+  const parol=document.getElementById('ae-parol').value.trim();
+  if (!ism||!email) { showToast("⚠️ Ism va email majburiy",'error'); return; }
+  document.getElementById('admin-edit-spinner').style.display='inline-block';
+  document.getElementById('admin-edit-btn-text').textContent='Saqlanmoqda…';
+  document.getElementById('admin-edit-save-btn').disabled=true;
   try {
-    const res = await apiPost({
-      action: 'editAdmin',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      oldEmail: editAdminOldEmail,
-      newIsm: ism, newEmail: email,
-      newParol: parol
-    });
-    if (res.ok) {
-      closeAdminEdit();
-      loadAdmins();
-      showToast('✅ Admin yangilandi!', 'success');
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
-  } catch(e) {
-    showToast('❌ Xatolik yuz berdi', 'error');
-  }
-
-  document.getElementById('admin-edit-spinner').style.display = 'none';
-  document.getElementById('admin-edit-btn-text').textContent = 'Saqlash';
-  document.getElementById('admin-edit-save-btn').disabled = false;
+    const res = await api({ action:'editAdmin', email:currentUser.email, parol:currentUser.parol, oldEmail:editAdminOldEmail, newIsm:ism, newEmail:email, newParol:parol });
+    if (res.ok) { closeAdminEdit(); loadAdmins(); showToast('✅ Admin yangilandi!','success'); }
+    else showToast('❌ '+res.error,'error');
+  } catch(e) { showToast('❌ Xatolik','error'); }
+  document.getElementById('admin-edit-spinner').style.display='none';
+  document.getElementById('admin-edit-btn-text').textContent='Saqlash';
+  document.getElementById('admin-edit-save-btn').disabled=false;
 }
 
 // ─── TABLE ───
 function applyFilters() {
-  const q  = (document.getElementById('filter-search').value || '').toLowerCase();
+  const q  = (document.getElementById('filter-search').value||'').toLowerCase();
   const fm = document.getElementById('filter-maktab').value;
   const fs = document.getElementById('filter-sinf').value;
   const filtered = students.filter(s =>
     (!q  || (s.ism+' '+s.familiya+' '+s.telefon).toLowerCase().includes(q)) &&
-    (!fm || s.maktab === fm) &&
+    (!fm || String(s.maktab) === String(fm)) &&
     (!fs || s.sinf === fs)
   );
   renderTable(filtered);
@@ -766,9 +729,9 @@ function applyFilters() {
 
 function renderTable(data) {
   const tbody = document.getElementById('student-tbody');
-  const showAdmin = currentUser && currentUser.isSuper;
+  const isSuper = currentUser && currentUser.isSuper;
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="${showAdmin?11:10}">
+    tbody.innerHTML = `<tr><td colspan="${isSuper?11:10}">
       <div class="empty-state"><div class="empty-state-icon">📋</div><p>O'quvchi topilmadi</p></div>
     </td></tr>`;
     return;
@@ -777,18 +740,18 @@ function renderTable(data) {
     <tr>
       <td class="mono">${i+1}</td>
       <td><strong>${s.ism}</strong> ${s.familiya}</td>
-      <td class="mono">${s.telefon}</td>
-      <td class="mono">${s.telefon2||'—'}</td>
-      <td class="mono">${s.tug ? (String(s.tug).length >= 4 ? String(s.tug).substring(0,4) : s.tug) : '—'}</td>
-      <td>${s.maktab||'—'}</td>
+      <td><span class="maktab-badge">${s.maktab||'—'}</span></td>
       <td><span class="sinf-badge">${s.sinf||'—'}</span></td>
+      <td class="mono">${s.telefon||'—'}</td>
+      <td class="mono">${s.telefon2||'—'}</td>
+      <td class="mono">${formatTug(s.tug)}</td>
       <td>${s.manzil||'—'}</td>
-      ${showAdmin ? `<td class="mono" style="font-size:11px;">${s.admin||'—'}</td>` : ''}
+      ${isSuper ? `<td class="mono" style="font-size:11px;">${s.admin||'—'}</td>` : ''}
       <td class="mono">${formatDate(s.date)}</td>
       <td>
         <div style="display:flex;gap:6px;">
-          <button class="btn-action btn-edit" onclick="openEdit(${s.rowIndex})">✏️</button>
-          <button class="btn-action btn-del" onclick="deleteStudent(${s.rowIndex}, '${s.ism} ${s.familiya}')">🗑️</button>
+          <button class="btn-action" onclick="openEdit(${s.rowIndex})">✏️</button>
+          <button class="btn-action" onclick="deleteStudent(${s.rowIndex},'${s.ism} ${s.familiya}')">🗑️</button>
         </div>
       </td>
     </tr>`).join('');
@@ -797,21 +760,30 @@ function renderTable(data) {
 function updateMaktabFilter() {
   const sel = document.getElementById('filter-maktab');
   const cur = sel.value;
-  const list = [...new Set(students.map(s=>s.maktab).filter(Boolean))].sort();
+  const list = [...new Set(students.map(s=>s.maktab).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
   sel.innerHTML = '<option value="">Barcha maktab</option>' +
-    list.map(m=>`<option${m===cur?' selected':''}>${m}</option>`).join('');
+    list.map(m=>`<option${String(m)===String(cur)?' selected':''}>${m}</option>`).join('');
 }
 
 function updateCount() {
   document.getElementById('total-count').textContent = students.length + " o'quvchi";
 }
 
-// ─── FORMAT DATE ───
+// ─── FORMAT ───
 function formatDate(val) {
   if (!val) return '—';
   const d = new Date(val);
-  if (isNaN(d)) return val;
-  return d.toLocaleDateString('uz-UZ');
+  return isNaN(d) ? val : d.toLocaleDateString('uz-UZ');
+}
+function formatTug(val) {
+  if (!val) return '—';
+  // Google Sheets Date object yoki string
+  const s = String(val);
+  if (s.includes('T') || s.match(/^\d{4}-\d{2}-\d{2}/)) {
+    const d = new Date(s);
+    if (!isNaN(d)) return d.toLocaleDateString('uz-UZ');
+  }
+  return s;
 }
 
 // ─── EDIT STUDENT ───
@@ -821,10 +793,14 @@ function openEdit(rowIndex) {
   const s = students[rowIndex];
   if (!s) return;
   editRowIndex = rowIndex;
-  document.getElementById('e-ism').value = s.ism || '';
-  document.getElementById('e-familiya').value = s.familiya || '';
-  document.getElementById('e-telefon').value = s.telefon || '';
-  // tug formatini kun/oy/yil ga bo'lish
+  document.getElementById('e-ism').value = s.ism||'';
+  document.getElementById('e-familiya').value = s.familiya||'';
+  document.getElementById('e-maktab').value = s.maktab||'';
+  document.getElementById('e-sinf').value = s.sinf||'';
+  document.getElementById('e-telefon').value = s.telefon||'';
+  document.getElementById('e-telefon2').value = s.telefon2||'';
+  document.getElementById('e-manzil').value = s.manzil||'';
+  // Tug'ilgan sana
   if (s.tug) {
     const d = new Date(s.tug);
     if (!isNaN(d)) {
@@ -836,16 +812,11 @@ function openEdit(rowIndex) {
       document.getElementById('e-kun').value = '';
       document.getElementById('e-oy').value  = '';
       document.getElementById('e-yil').value = s.tug;
+      document.getElementById('e-tug').value = '';
     }
   } else {
-    document.getElementById('e-kun').value = '';
-    document.getElementById('e-oy').value  = '';
-    document.getElementById('e-yil').value = '';
+    ['e-kun','e-oy','e-yil','e-tug'].forEach(id=>document.getElementById(id).value='');
   }
-  document.getElementById('e-telefon2').value = s.telefon2 || '';
-  document.getElementById('e-manzil').value = s.manzil || '';
-  document.getElementById('e-maktab').value = s.maktab || '';
-  document.getElementById('e-sinf').value = s.sinf || '';
   document.getElementById('edit-modal').style.display = 'flex';
 }
 
@@ -854,59 +825,49 @@ function closeEdit() {
   editRowIndex = null;
 }
 
-function closeEditIfOverlay(e) {
-  if (e.target === document.getElementById('edit-modal')) closeEdit();
-}
-
 async function saveEdit() {
   const ism      = document.getElementById('e-ism').value.trim();
   const familiya = document.getElementById('e-familiya').value.trim();
+  const maktab   = getMaktabValue('e-maktab');
+  const sinf     = document.getElementById('e-sinf').value;
   const telefon  = document.getElementById('e-telefon').value.trim();
-  // Tug'ilgan sanani yig'ish
-  const eKun = String(document.getElementById('e-kun').value || '').padStart(2,'0');
+  const telefon2 = document.getElementById('e-telefon2').value.trim();
+  const manzil   = document.getElementById('e-manzil').value.trim();
+
+  const eKun = String(document.getElementById('e-kun').value||'').padStart(2,'0');
   const eOy  = document.getElementById('e-oy').value;
   const eYil = document.getElementById('e-yil').value;
   if (eYil && (eYil < 2009 || eYil > 2019)) {
-    showToast("⚠️ Yil 2009-2019 oralig'ida bo'lishi kerak", 'error'); return;
+    showToast("⚠️ Yil 2009-2019 oralig'ida bo'lishi kerak",'error'); return;
   }
   if (eYil && eOy && eKun) document.getElementById('e-tug').value = eYil+'-'+eOy+'-'+eKun;
   const tug = document.getElementById('e-tug').value;
-  const telefon2 = document.getElementById('e-telefon2').value.trim();
-  const manzil   = document.getElementById('e-manzil').value.trim();
-  const maktab   = document.getElementById('e-maktab').value.trim();
-  const sinf     = document.getElementById('e-sinf').value;
 
-  if (!ism || !familiya || !telefon || !maktab || !sinf) {
-    showToast("⚠️ Barcha maydonlarni to'ldiring", 'error'); return;
-  }
+  if (!ism||!familiya) { showToast("⚠️ Ism va familiyani kiriting",'error'); return; }
+  if (!maktab) { showToast("⚠️ Maktab raqamini to'g'ri kiriting (1–99)",'error'); document.getElementById('e-maktab').classList.add('error'); return; }
+  if (!sinf)   { showToast("⚠️ Sinfni tanlang",'error'); return; }
+  if (!telefon){ showToast("⚠️ Telefon raqamini kiriting",'error'); return; }
 
   const s = students[editRowIndex];
-  document.getElementById('edit-spinner').style.display = 'inline-block';
-  document.getElementById('edit-btn-text').textContent = 'Saqlanmoqda…';
-  document.getElementById('edit-save-btn').disabled = true;
+  document.getElementById('edit-spinner').style.display='inline-block';
+  document.getElementById('edit-btn-text').textContent='Saqlanmoqda…';
+  document.getElementById('edit-save-btn').disabled=true;
 
   try {
-    const res = await apiPost({
-      action: 'editStudent',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      oldIsm: s.ism, oldFamiliya: s.familiya, oldTelefon: s.telefon,
-      ism, familiya, telefon, telefon2, manzil, tug, maktab, sinf
+    const res = await api({
+      action:'editStudent', email:currentUser.email, parol:currentUser.parol,
+      oldIsm:s.ism, oldFamiliya:s.familiya,
+      ism, familiya, maktab, sinf, telefon, telefon2, manzil, tug
     });
     if (res.ok) {
-      closeEdit();
-      await loadStudents();
-      showToast("✅ O'quvchi yangilandi!", 'success');
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
-  } catch(e) {
-    showToast('❌ Xatolik yuz berdi', 'error');
-  }
+      closeEdit(); await loadStudents();
+      showToast("✅ O'quvchi yangilandi!",'success');
+    } else showToast('❌ '+res.error,'error');
+  } catch(e) { showToast('❌ Xatolik yuz berdi','error'); }
 
-  document.getElementById('edit-spinner').style.display = 'none';
-  document.getElementById('edit-btn-text').textContent = 'Saqlash';
-  document.getElementById('edit-save-btn').disabled = false;
+  document.getElementById('edit-spinner').style.display='none';
+  document.getElementById('edit-btn-text').textContent='Saqlash';
+  document.getElementById('edit-save-btn').disabled=false;
 }
 
 // ─── DELETE STUDENT ───
@@ -914,54 +875,41 @@ async function deleteStudent(rowIndex, name) {
   if (!confirm(`"${name}" o'quvchini o'chirishni tasdiqlaysizmi?`)) return;
   const s = students[rowIndex];
   try {
-    const res = await apiPost({
-      action: 'deleteStudent',
-      email: currentUser.email,
-      parol: currentUser.parol,
-      delIsm: s.ism, delFamiliya: s.familiya, delTelefon: s.telefon
-    });
-    if (res.ok) {
-      await loadStudents();
-      showToast("✅ O'quvchi o'chirildi", 'success');
-    } else {
-      showToast('❌ ' + res.error, 'error');
-    }
-  } catch(e) {
-    showToast('❌ Xatolik yuz berdi', 'error');
-  }
+    const res = await api({ action:'deleteStudent', email:currentUser.email, parol:currentUser.parol, delIsm:s.ism, delFamiliya:s.familiya });
+    if (res.ok) { await loadStudents(); showToast("✅ O'quvchi o'chirildi",'success'); }
+    else showToast('❌ '+res.error,'error');
+  } catch(e) {}
 }
 
 // ─── HELPERS ───
-async function apiPost(body) {
-  const qs = Object.entries(body)
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join('&');
+async function api(body) {
+  const qs = Object.entries(body).map(([k,v])=>`${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   const res = await fetch(`${APPS_SCRIPT_URL}?${qs}`);
   return res.json();
 }
 
 function clearForm() {
-  ['f-ism','f-familiya','f-telefon','f-telefon2','f-manzil','f-tug','f-maktab','f-sinf','f-kun','f-yil'].forEach(id=>{
+  ['f-ism','f-familiya','f-maktab','f-telefon','f-telefon2','f-manzil','f-tug','f-kun','f-yil'].forEach(id=>{
     document.getElementById(id).value='';
+    document.getElementById(id).classList && document.getElementById(id).classList.remove('error');
   });
   document.getElementById('f-oy').value='';
+  document.getElementById('f-sinf').value='';
 }
 
 function setLoading(s) {
-  document.getElementById('submit-btn').disabled = s;
-  document.getElementById('spinner').style.display = s ? 'inline-block' : 'none';
-  document.getElementById('btn-text').textContent = s ? 'Saqlanmoqda…' : 'Saqlash';
+  document.getElementById('submit-btn').disabled=s;
+  document.getElementById('spinner').style.display=s?'inline-block':'none';
+  document.getElementById('btn-text').textContent=s?'Saqlanmoqda…':'Saqlash';
 }
-
 function showLoading(s) {
-  document.getElementById('loading-overlay').style.display = s ? 'flex' : 'none';
+  document.getElementById('loading-overlay').style.display=s?'flex':'none';
 }
 
 let toastTimer;
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
+  t.textContent=msg; t.className='toast show '+type;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>{ t.className='toast'; }, 3000);
 }
