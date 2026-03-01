@@ -1,75 +1,72 @@
 // ═══════════════════════════════════════════════════
-//  InnovateIT School — Frontend JavaScript
+//  InnovateIT School — Frontend JS  (v2.0)
+//  username tizimi + super admin ko'rinishi
 // ═══════════════════════════════════════════════════
 
 const API = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8qFV81dHH1QPMkFezQENr6S33bn07dLpK_l7fOw1pmHg/exec";
 
-// Global holat
-let U = null; // Joriy foydalanuvchi
-let S = [];   // O'quvchilar ro'yxati
+let U  = null; // Joriy foydalanuvchi { username, parol, ism, isSuper }
+let S  = [];   // Ko'rinayotgan o'quvchilar ro'yxati
+let ADMINS = []; // Super admin uchun adminlar ro'yxati
+
+// Super admin boshqa adminni kuzatayotganda shu o'zgaruvchi to'ladi
+let viewingAdmin = null; // { username, ism } | null
 
 // ─────────────────────────────────────────────
-//  ILOVA YUKLANGANDA
+//  YUKLANGANDA
 // ─────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   try {
     const saved = localStorage.getItem('iit_u');
-    if (saved) {
-      U = JSON.parse(saved);
-      await showApp();
-    }
-  } catch (e) {
-    localStorage.removeItem('iit_u');
-  }
+    if (saved) { U = JSON.parse(saved); await showApp(); }
+  } catch (e) { localStorage.removeItem('iit_u'); }
+
+  g('inp-parol').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  g('inp-username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') g('inp-parol').focus();
+  });
 });
 
 // ─────────────────────────────────────────────
 //  LOGIN / LOGOUT
 // ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('inp-parol').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
-});
-
 async function doLogin() {
-  const email = g('inp-email').value.trim();
-  const parol = g('inp-parol').value;
-  if (!email || !parol) return;
+  const username = g('inp-username').value.trim();
+  const parol    = g('inp-parol').value;
+  if (!username || !parol) return;
 
   const btn = g('login-btn');
-  btn.disabled = true;
-  btn.textContent = 'Tekshirilmoqda…';
+  btn.disabled = true; btn.textContent = 'Tekshirilmoqda…';
 
   try {
-    const r = await req({ action: 'login', email, parol });
+    const r = await req({ action: 'login', username, parol });
     if (r.ok) {
-      U = { email, parol, ism: r.ism, isSuper: r.isSuper };
+      U = { username, parol, ism: r.ism, isSuper: r.isSuper };
       localStorage.setItem('iit_u', JSON.stringify(U));
       showApp();
     } else {
-      const el = g('login-err');
-      el.textContent = '❌ ' + (r.error || "Noto'g'ri");
-      el.style.display = 'block';
+      showErr(g('login-err'), r.error || "Username yoki parol noto'g'ri");
     }
   } catch (e) {
-    const el = g('login-err');
-    el.textContent = '❌ Ulanishda xatolik';
-    el.style.display = 'block';
+    showErr(g('login-err'), 'Ulanishda xatolik');
   }
+  btn.disabled = false; btn.textContent = 'Kirish';
+}
 
-  btn.disabled = false;
-  btn.textContent = 'Kirish';
+function showErr(el, msg) {
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
 }
 
 function doLogout() {
-  U = null;
-  S = [];
+  U = null; S = []; ADMINS = []; viewingAdmin = null;
   localStorage.removeItem('iit_u');
   g('app').style.display = 'none';
   g('login-screen').style.display = 'flex';
-  g('inp-email').value = '';
-  g('inp-parol').value = '';
+  g('inp-username').value = '';
+  g('inp-parol').value    = '';
   g('login-err').style.display = 'none';
 }
 
@@ -86,9 +83,11 @@ async function showApp() {
   if (U.isSuper) {
     b.classList.add('super');
     b.textContent = '⭐ ' + U.ism;
-    g('tabs-row').style.display = 'flex';
-    g('admin-col').style.display = '';
-    loadAdmins();
+    g('tabs-row').style.display     = 'flex';
+    g('admin-col').style.display    = '';
+    g('admin-selector-wrap').style.display = 'flex';
+    await loadAdmins();
+    buildAdminSelector();
   }
 
   await loadStudents();
@@ -103,22 +102,54 @@ function switchTab(t) {
 }
 
 // ─────────────────────────────────────────────
+//  SUPER ADMIN: ADMIN SELECTOR
+// ─────────────────────────────────────────────
+function buildAdminSelector() {
+  const sel = g('admin-selector');
+  sel.innerHTML = '<option value="">👁 O\'z o\'quvchilarim</option>' +
+    ADMINS.map(a => `<option value="${esc(a.username)}">${a.ism} (${a.username})</option>`).join('');
+  sel.value = viewingAdmin ? viewingAdmin.username : '';
+}
+
+async function onAdminSelect() {
+  const sel = g('admin-selector');
+  const val = sel.value;
+
+  if (!val) {
+    viewingAdmin = null;
+  } else {
+    const found = ADMINS.find(a => a.username === val);
+    viewingAdmin = found ? { username: found.username, ism: found.ism } : null;
+  }
+
+  // O'quvchilar ro'yxatini qayta yuklash
+  await loadStudents();
+}
+
+// ─────────────────────────────────────────────
 //  O'QUVCHILAR
 // ─────────────────────────────────────────────
 async function loadStudents() {
   g('loading-ov').style.display = 'flex';
   try {
-    const d = await req({ action: 'getStudents', email: U.email, parol: U.parol });
+    // Super admin boshqa adminni ko'rayotganda getStudents orqali emas,
+    // balki barcha o'quvchilardan filter qilib ko'rsatamiz
+    const d = await req({ action: 'getStudents', username: U.username, parol: U.parol });
     if (d.ok) {
-      S = d.students;
+      let students = d.students;
+
+      // Super admin biror adminni tanlagan bo'lsa, filter
+      if (U.isSuper && viewingAdmin) {
+        students = students.filter(s => s.admin === viewingAdmin.username);
+      }
+
+      S = students;
       S.forEach((s, i) => s.ri = i);
       updMaktabF();
       applyFilters();
       g('total-count').textContent = S.length + " o'quvchi";
     }
-  } catch (e) {
-    toast("❌ Ma'lumotlar yuklanmadi", 'error');
-  }
+  } catch (e) { toast("❌ Ma'lumotlar yuklanmadi", 'error'); }
   g('loading-ov').style.display = 'none';
 }
 
@@ -147,7 +178,7 @@ async function addStudent() {
   bl('submit-btn', 'spinner', 'btn-txt', true, 'Saqlanmoqda…');
   try {
     const r = await req({
-      action: 'addStudent', email: U.email, parol: U.parol,
+      action: 'addStudent', username: U.username, parol: U.parol,
       ism, familiya: fam, maktab, sinf,
       telefon: tel, telefon2: tel2, manzil, tug,
       date: new Date().toLocaleDateString('uz-UZ')
@@ -158,7 +189,6 @@ async function addStudent() {
   bl('submit-btn', 'spinner', 'btn-txt', false, 'Saqlash');
 }
 
-// ── Filter & Render ──
 function applyFilters() {
   const q  = (g('f-search').value || '').toLowerCase();
   const fm = g('f-maktab-f').value;
@@ -234,21 +264,17 @@ function renderMob(d) {
 }
 
 function updMaktabF() {
-  const sel  = g('f-maktab-f');
-  const cur  = sel.value;
+  const sel  = g('f-maktab-f'), cur = sel.value;
   const list = [...new Set(S.map(s => s.maktab).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
   sel.innerHTML = '<option value="">Barcha maktab</option>' +
     list.map(m => `<option${String(m) === String(cur) ? ' selected' : ''}>${m}</option>`).join('');
 }
 
-// ── O'quvchini tahrirlash (modal) ──
+// ── O'quvchi tahrirlash ──
 let eIdx = null;
 
 function openES(idx) {
-  const s = S[idx];
-  if (!s) return;
-  eIdx = idx;
-
+  const s = S[idx]; if (!s) return; eIdx = idx;
   g('e-ism').value      = s.ism      || '';
   g('e-familiya').value = s.familiya || '';
   g('e-maktab').value   = s.maktab   || '';
@@ -268,14 +294,10 @@ function openES(idx) {
   } else {
     ['e-kun', 'e-oy', 'e-yil', 'e-tug'].forEach(id => g(id).value = '');
   }
-
   g('es-modal').style.display = 'flex';
 }
 
-function closeES() {
-  g('es-modal').style.display = 'none';
-  eIdx = null;
-}
+function closeES() { g('es-modal').style.display = 'none'; eIdx = null; }
 
 async function saveES() {
   const ism    = g('e-ism').value.trim();
@@ -302,7 +324,7 @@ async function saveES() {
   bl('es-save', 'es-spinner', 'es-btn-txt', true, 'Saqlanmoqda…');
   try {
     const r = await req({
-      action: 'editStudent', email: U.email, parol: U.parol,
+      action: 'editStudent', username: U.username, parol: U.parol,
       oldIsm: s.ism, oldFamiliya: s.familiya,
       ism, familiya: fam, maktab, sinf,
       telefon: tel, telefon2: tel2, manzil, tug
@@ -317,7 +339,7 @@ async function delS(idx, name) {
   if (!confirm(`"${name}" o'chirilsinmi?`)) return;
   const s = S[idx];
   try {
-    const r = await req({ action: 'deleteStudent', email: U.email, parol: U.parol, delIsm: s.ism, delFamiliya: s.familiya });
+    const r = await req({ action: 'deleteStudent', username: U.username, parol: U.parol, delIsm: s.ism, delFamiliya: s.familiya });
     if (r.ok) { await loadStudents(); toast("✅ O'quvchi o'chirildi", 'success'); }
     else toast('❌ ' + r.error, 'error');
   } catch (e) {}
@@ -328,8 +350,8 @@ async function delS(idx, name) {
 // ─────────────────────────────────────────────
 async function loadAdmins() {
   try {
-    const d = await req({ action: 'getAdmins', email: U.email, parol: U.parol });
-    if (d.ok) renderAdmins(d.admins);
+    const d = await req({ action: 'getAdmins', username: U.username, parol: U.parol });
+    if (d.ok) { ADMINS = d.admins; renderAdmins(d.admins); }
   } catch (e) {}
 }
 
@@ -343,79 +365,105 @@ function renderAdmins(admins) {
     <div class="admin-item">
       <div class="admin-info">
         <span class="admin-name">${a.ism}</span>
-        <span class="admin-email">${a.email}</span>
+        <span class="admin-email">@${a.username}</span>
         <span class="admin-ptag">🔑 ${a.parol || '—'}</span>
       </div>
       <div class="admin-acts">
-        <button class="btn-action" onclick="openAE('${esc(a.email)}','${esc(a.ism)}','${esc(a.parol || '')}')">✏️</button>
-        <button class="btn-small"  onclick="delA('${esc(a.email)}','${esc(a.ism)}')">O'chirish</button>
+        <button class="btn-action" onclick="openAE('${esc(a.username)}','${esc(a.ism)}','${esc(a.parol || '')}')">✏️</button>
+        <button class="btn-small"  onclick="delA('${esc(a.username)}','${esc(a.ism)}')">O'chirish</button>
       </div>
     </div>`).join('');
 }
 
 async function createAdmin() {
-  const ism   = g('a-ism').value.trim();
-  const email = g('a-email').value.trim();
-  const parol = g('a-parol').value.trim();
-  if (!ism || !email || !parol) { toast("⚠️ Barcha maydonlarni to'ldiring", 'error'); return; }
+  const ism      = g('a-ism').value.trim();
+  const username = g('a-username').value.trim();
+  const parol    = g('a-parol').value.trim();
+  if (!ism || !username || !parol) { toast("⚠️ Barcha maydonlarni to'ldiring", 'error'); return; }
 
   bl(null, 'a-spinner', 'a-btn-txt', true, 'Yaratilmoqda…');
   try {
-    const r = await req({ action: 'createAdmin', email: U.email, parol: U.parol, newIsm: ism, newEmail: email, newParol: parol });
+    const r = await req({
+      action: 'createAdmin', username: U.username, parol: U.parol,
+      newIsm: ism, newUsername: username, newParol: parol
+    });
     if (r.ok) {
-      ['a-ism', 'a-email', 'a-parol'].forEach(id => g(id).value = '');
+      ['a-ism', 'a-username', 'a-parol'].forEach(id => g(id).value = '');
       toast('✅ Admin yaratildi!', 'success');
-      loadAdmins();
+      await loadAdmins();
+      buildAdminSelector(); // Dropdown ni yangilash
     } else toast('❌ ' + r.error, 'error');
   } catch (e) { toast('❌ Xatolik', 'error'); }
   bl(null, 'a-spinner', 'a-btn-txt', false, 'Yaratish');
 }
 
-async function delA(email, ism) {
+async function delA(username, ism) {
   if (!confirm(`"${ism}" o'chirilsinmi?`)) return;
   try {
-    const r = await req({ action: 'deleteAdmin', email: U.email, parol: U.parol, deleteEmail: email });
-    if (r.ok) { toast("✅ Admin o'chirildi", 'success'); loadAdmins(); }
-    else toast('❌ ' + r.error, 'error');
+    const r = await req({ action: 'deleteAdmin', username: U.username, parol: U.parol, deleteUsername: username });
+    if (r.ok) {
+      toast("✅ Admin o'chirildi", 'success');
+      await loadAdmins();
+      buildAdminSelector();
+    } else toast('❌ ' + r.error, 'error');
   } catch (e) {}
 }
 
-// ── Adminni tahrirlash (modal) ──
 let aeOld = null;
 
-function openAE(email, ism, parol) {
-  aeOld = email;
-  g('ae-ism').value   = ism;
-  g('ae-email').value = email;
-  g('ae-parol').value = '';
+function openAE(username, ism, parol) {
+  aeOld = username;
+  g('ae-ism').value      = ism;
+  g('ae-username').value = username;
+  g('ae-parol').value    = '';
   g('ae-modal').style.display = 'flex';
 }
-
-function closeAE() {
-  g('ae-modal').style.display = 'none';
-  aeOld = null;
-}
+function closeAE() { g('ae-modal').style.display = 'none'; aeOld = null; }
 
 async function saveAE() {
-  const ism   = g('ae-ism').value.trim();
-  const email = g('ae-email').value.trim();
-  const parol = g('ae-parol').value.trim();
-  if (!ism || !email) { toast("⚠️ Ism va email majburiy", 'error'); return; }
+  const ism      = g('ae-ism').value.trim();
+  const username = g('ae-username').value.trim();
+  const parol    = g('ae-parol').value.trim();
+  if (!ism || !username) { toast("⚠️ Ism va username majburiy", 'error'); return; }
 
   bl('ae-save', 'ae-spinner', 'ae-btn-txt', true, 'Saqlanmoqda…');
   try {
-    const r = await req({ action: 'editAdmin', email: U.email, parol: U.parol, oldEmail: aeOld, newIsm: ism, newEmail: email, newParol: parol });
-    if (r.ok) { closeAE(); loadAdmins(); toast('✅ Admin yangilandi!', 'success'); }
-    else toast('❌ ' + r.error, 'error');
+    const r = await req({
+      action: 'editAdmin', username: U.username, parol: U.parol,
+      oldUsername: aeOld, newIsm: ism, newUsername: username, newParol: parol
+    });
+    if (r.ok) {
+      closeAE();
+      await loadAdmins();
+      buildAdminSelector();
+      toast('✅ Admin yangilandi!', 'success');
+    } else toast('❌ ' + r.error, 'error');
   } catch (e) { toast('❌ Xatolik', 'error'); }
   bl('ae-save', 'ae-spinner', 'ae-btn-txt', false, 'Saqlash');
 }
 
 // ─────────────────────────────────────────────
+//  DAVOMAT SAHIFASIGA O'TISH
+// ─────────────────────────────────────────────
+function openDavomat() {
+  // Joriy foydalanuvchi ma'lumotlarini sessionStorage ga saqlash
+  // (davomat.html uni o'qiydi)
+  const davomatUser = {
+    username: U.username,
+    parol:    U.parol,
+    ism:      U.ism,
+    isSuper:  U.isSuper,
+    // Super admin boshqa adminni ko'rayotgan bo'lsa
+    viewingUsername: viewingAdmin ? viewingAdmin.username : null,
+    viewingIsm:      viewingAdmin ? viewingAdmin.ism      : null
+  };
+  sessionStorage.setItem('iit_davomat_user', JSON.stringify(davomatUser));
+  window.location.href = 'davomat.html';
+}
+
+// ─────────────────────────────────────────────
 //  YORDAMCHI FUNKSIYALAR
 // ─────────────────────────────────────────────
-
-/** Google Apps Script ga so'rov yuboradi */
 async function req(body) {
   const qs = Object.entries(body)
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
@@ -423,30 +471,23 @@ async function req(body) {
   return (await fetch(`${API}?${qs}`)).json();
 }
 
-/** Yangi o'quvchi formini tozalaydi */
 function clearF() {
-  ['f-ism', 'f-familiya', 'f-maktab', 'f-tel', 'f-tel2', 'f-manzil', 'f-tug', 'f-kun', 'f-yil'].forEach(id => {
-    const e = g(id);
-    e.value = '';
-    e.classList && e.classList.remove('err');
+  ['f-ism','f-familiya','f-maktab','f-tel','f-tel2','f-manzil','f-tug','f-kun','f-yil'].forEach(id => {
+    const e = g(id); e.value = ''; e.classList && e.classList.remove('err');
   });
-  g('f-oy').value = '';
-  g('f-sinf').value = '';
+  g('f-oy').value = ''; g('f-sinf').value = '';
 }
 
-/** Tugmani loading holatiga o'tkazadi yoki qaytaradi */
 function bl(btnId, spId, txtId, loading, txt) {
   if (btnId) g(btnId).disabled = loading;
   g(spId).style.display = loading ? 'inline-block' : 'none';
-  g(txtId).textContent = txt;
+  g(txtId).textContent  = txt;
 }
 
-/** Parol ko'rsatish/yashirish */
 function togglePw(id) {
-  const i  = document.getElementById(id);
+  const i = document.getElementById(id);
   const ic = document.getElementById('eye-' + id);
-  const h  = i.type === 'password';
-  i.type   = h ? 'text' : 'password';
+  const h  = i.type === 'password'; i.type = h ? 'text' : 'password';
   ic.innerHTML = h
     ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
     : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
@@ -454,7 +495,6 @@ function togglePw(id) {
        <line x1="1" y1="1" x2="23" y2="23"/>`;
 }
 
-/** Maktab raqamini tekshiradi (1–99) */
 function valM(inp) {
   let v = inp.value.replace(/\D/g, '');
   if (v.length > 2) v = v.slice(0, 2);
@@ -463,43 +503,33 @@ function valM(inp) {
   inp.classList.toggle('err', !!(v && (isNaN(n) || n < 1 || n > 99)));
 }
 
-/** Maktab qiymatini qaytaradi, noto'g'ri bo'lsa null */
 function getM(id) {
   const v = document.getElementById(id).value.trim();
   const n = parseInt(v);
   return (!v || isNaN(n) || n < 1 || n > 99) ? null : String(n);
 }
 
-/** getElementById qisqartmasi */
-function g(id) { return document.getElementById(id); }
-
-/** HTML apostroflardan himoyalanadi */
+function g(id)  { return document.getElementById(id); }
 function esc(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
-/** Sana formatlaydi (qo'shilgan sanasi) */
 function fDate(v) {
   if (!v) return '—';
   const d = new Date(v);
   return isNaN(d) ? v : d.toLocaleDateString('uz-UZ');
 }
 
-/** Tug'ilgan sanani formatlaydi */
 function fTug(v) {
   if (!v) return '—';
   const s = String(v);
   if (s.match(/^\d{4}-\d{2}-\d{2}/) || s.includes('T')) {
-    const d = new Date(s);
-    if (!isNaN(d)) return d.toLocaleDateString('uz-UZ');
+    const d = new Date(s); if (!isNaN(d)) return d.toLocaleDateString('uz-UZ');
   }
   return s.length >= 4 ? s.substring(0, 4) : s;
 }
 
-/** Toast xabar ko'rsatadi */
 let toastT;
 function toast(msg, type = '') {
   const t = g('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  clearTimeout(toastT);
-  toastT = setTimeout(() => { t.className = 'toast'; }, 3000);
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.className = 'toast'; }, 3000);
 }
