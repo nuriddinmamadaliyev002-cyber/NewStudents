@@ -41,16 +41,18 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch (e) { window.location.href = 'index.html'; return; }
 
   // Kimning davomati ko'rsatiladi?
-  if (U.isSuper && U.viewingUsername) {
-    WU = { username: U.viewingUsername, ism: U.viewingIsm };
-  } else {
-    WU = { username: U.username, ism: U.ism };
-  }
+  // Yangi tizimda: super admin maktab tanlagan bo'lsa, U.username = maktab admin username
+  // isSuperProxy belgisi orqali aniqlaymiz
+  WU = { username: U.username, ism: U.ism };
 
   // Badge
   const badge = g('dav-badge');
-  badge.textContent = U.isSuper ? '⭐ ' + U.ism : U.ism;
-  if (U.isSuper) badge.classList.add('super');
+  if (U.isSuperProxy) {
+    badge.textContent = '🏫 ' + U.ism;
+    badge.classList.add('super');
+  } else {
+    badge.textContent = U.ism;
+  }
 
   // Sana picker max = bugun
   g('date-picker').max = dateStr(TODAY);
@@ -149,10 +151,8 @@ async function loadStudents() {
   try {
     const d = await req({ action: 'getStudents', username: U.username, parol: U.parol });
     if (d.ok) {
-      // Faqat shu adminning o'quvchilari
-      STUDENTS = U.isSuper && WU.username !== U.username
-        ? d.students.filter(s => s.admin === WU.username)
-        : d.students;
+      // Yangi tizimda U.username = maktab admin username, shuning uchun d.students faqat shu admining o'quvchilari
+      STUDENTS = d.students;
       render();
     } else {
       toast('❌ ' + d.error, 'error');
@@ -169,9 +169,6 @@ async function loadDavomat(date) {
       parol:    U.parol,
       sana:     dateStr(date)
     };
-    if (U.isSuper && WU.username !== U.username) {
-      params.adminUsername = WU.username;
-    }
     const d = await req(params);
     if (d.ok && d.records.length) {
       // Mavjud davomatni attendance obyektiga yuklash
