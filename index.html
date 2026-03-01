@@ -19,7 +19,7 @@
     <div class="field-group">
       <label class="field-label">Username</label>
       <input class="field-input" type="text" id="inp-username"
-        placeholder="admin_username" autocomplete="username">
+        placeholder="admin_ism" autocomplete="username">
     </div>
 
     <div class="field-group">
@@ -47,19 +47,19 @@
 
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-brand">InnovateIT</div>
+    <div class="topbar-brand">InnovateIT School</div>
     <div class="topbar-right">
 
-      <!-- Super admin uchun: admin tanlash -->
+      <!-- Super admin uchun: maktab (admin) tanlash -->
       <div class="admin-selector-wrap" id="admin-selector-wrap" style="display:none;">
         <select class="admin-selector" id="admin-selector" onchange="onAdminSelect()">
-          <option value="">👁 Admin tanlang</option>
+          <option value="">👁 Barcha o'quvchilar</option>
         </select>
       </div>
 
       <span class="admin-badge" id="admin-badge"></span>
       <span class="stat-badge"  id="total-count">0</span>
-      <button class="btn-davomat" onclick="openDavomat()">📋 Davomat</button>
+      <button class="btn-davomat" id="btn-davomat" onclick="openDavomat()">📋 Davomat</button>
       <button class="btn-logout"  onclick="doLogout()">Chiqish</button>
     </div>
   </div>
@@ -177,8 +177,8 @@
         <div class="card-title">➕ Yangi admin yaratish</div>
         <div class="create-grid">
           <div class="field-group" style="margin:0">
-            <label class="field-label">Ism</label>
-            <input class="field-input" id="a-ism" placeholder="Ali Valiyev">
+            <label class="field-label">Maktab nomi</label>
+            <input class="field-input" id="a-ism" placeholder="InnovateIT School5">
           </div>
           <div class="field-group" style="margin:0">
             <label class="field-label">Username</label>
@@ -222,7 +222,7 @@
     <div class="modal-title">✏️ Adminni tahrirlash</div>
     <div class="form-grid">
       <div class="field-group">
-        <label class="field-label">Ism</label>
+        <label class="field-label">Maktab nomi</label>
         <input class="field-input" id="ae-ism">
       </div>
       <div class="field-group">
