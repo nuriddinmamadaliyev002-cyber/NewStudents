@@ -460,6 +460,19 @@ async function saveAE() {
 // ─────────────────────────────────────────────
 //  DAVOMAT SAHIFASIGA O'TISH
 // ─────────────────────────────────────────────
+function openTeachers() {
+  // Super admin boshqa adminni tanlagan bo'lsa, uning nomidan o'qituvchilarni ko'radi
+  const isProxy = U.isSuper && viewingAdmin;
+  const teacherUser = {
+    username: isProxy ? viewingAdmin.username : U.username,
+    parol:    isProxy ? viewingAdmin.parol    : U.parol,
+    ism:      isProxy ? viewingAdmin.ism      : U.ism,
+    isSuper:  false
+  };
+  sessionStorage.setItem('iit_teacher_user', JSON.stringify(teacherUser));
+  window.location.href = 'oqituvchilar.html';
+}
+
 function openDavomat() {
   // Super admin biror maktabni tanlamagan bo'lsa chiqish
   if (U.isSuper && !viewingAdmin) {
