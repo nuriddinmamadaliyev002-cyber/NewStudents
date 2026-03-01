@@ -295,10 +295,24 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 
 <script>
 // ⚠️ Shu yerga o'zingizning Apps Script URL ni qo'ying:
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-zUA2m9oGvK7QQVObrJtV6iJc2WE7ZQ3NSJu8iQZp1GHxaBJn29gQ67q2ts9kqZO_GQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVomis2jHDoiEDNZCvRRopDiFiNrIvhRmFh1P4wgnnJtDnKZwS15QTgQWD_8ioLcJVkw/exec";
 
 let currentUser = null;
 let students = [];
+
+// ─── AUTO LOGIN (localStorage) ───
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem('innovateit_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      await showApp();
+    } catch(e) {
+      localStorage.removeItem('innovateit_user');
+    }
+  }
+});
+
 
 // ─── SHOW / HIDE PASSWORD ───
 function togglePassword(inputId, btn) {
@@ -340,6 +354,7 @@ async function doLogin() {
     const res = await apiPost({ action: 'login', email, parol });
     if (res.ok) {
       currentUser = { email, parol, ism: res.ism, isSuper: res.isSuper };
+      localStorage.setItem('innovateit_user', JSON.stringify(currentUser));
       showApp();
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -357,6 +372,7 @@ async function doLogin() {
 function doLogout() {
   currentUser = null;
   students = [];
+  localStorage.removeItem('innovateit_user');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('inp-email').value = '';
