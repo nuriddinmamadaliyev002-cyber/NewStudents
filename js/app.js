@@ -86,8 +86,11 @@ async function showApp() {
     g('tabs-row').style.display     = 'flex';
     g('admin-col').style.display    = '';
     g('admin-selector-wrap').style.display = 'flex';
-    // Super admin uchun: Davomat yashiriq, form yashiriq
-    g('btn-davomat').style.display = 'none';
+    // Super admin uchun Amal ustunini yashirish
+    const amalCol = g('amal-col'); if(amalCol) amalCol.style.display = 'none';
+    // Super admin uchun: Davomat va form yashiriq, O'qituvchilar KO'RINADI (umumiy tahlil)
+    g('btn-davomat').style.display   = 'none';
+    g('btn-teachers').style.display  = '';
     g('add-student-form').style.display = 'none';
     await loadAdmins();
     buildAdminSelector();
@@ -123,14 +126,16 @@ async function onAdminSelect() {
 
   if (!val) {
     viewingAdmin = null;
-    // Hech qaysi maktab tanlanmagan — Davomat va form yashiriq
-    g('btn-davomat').style.display = 'none';
+    // Hech qaysi maktab tanlanmagan — Davomat va form yashiriq, O'qituvchilar umumiy ko'rinishda
+    g('btn-davomat').style.display   = 'none';
+    g('btn-teachers').style.display  = '';
     g('add-student-form').style.display = 'none';
   } else {
     const found = ADMINS.find(a => a.username === val);
     viewingAdmin = found ? { username: found.username, ism: found.ism, parol: found.parol } : null;
-    // Maktab tanlangan — Davomat va form ko'rinadi
-    g('btn-davomat').style.display = '';
+    // Maktab tanlangan — Davomat, O'qituvchilar, form ko'rinadi
+    g('btn-davomat').style.display   = '';
+    g('btn-teachers').style.display  = '';
     g('add-student-form').style.display = 'block';
   }
 
@@ -221,7 +226,7 @@ function renderTbl(d) {
   const tb  = g('tbl-body');
   const sup = U && U.isSuper;
   if (!d.length) {
-    tb.innerHTML = `<tr><td colspan="${sup ? 11 : 10}">
+    tb.innerHTML = `<tr><td colspan="${sup ? 10 : 10}">
       <div class="empty-state"><div class="empty-state-icon">📋</div><p>O'quvchi topilmadi</p></div>
     </td></tr>`;
     return;
@@ -237,10 +242,10 @@ function renderTbl(d) {
     <td>${s.manzil || '—'}</td>
     ${sup ? `<td class="mono" style="font-size:11px;">${s.admin || '—'}</td>` : ''}
     <td class="mono">${fDate(s.date)}</td>
-    <td><div style="display:flex;gap:6px;">
+    ${!sup ? `<td><div style="display:flex;gap:6px;">
       <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
       <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism + ' ' + s.familiya)}')">🗑️</button>
-    </div></td>
+    </div></td>` : ''}
   </tr>`).join('');
 }
 
@@ -262,10 +267,10 @@ function renderMob(d) {
             <span class="sinf-badge">${s.sinf || '—'}</span>
           </div>
         </div>
-        <div class="sc-btns">
+        ${!sup ? `<div class="sc-btns">
           <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
           <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism + ' ' + s.familiya)}')">🗑️</button>
-        </div>
+        </div>` : ''}
       </div>
       <div class="sc-body">
         <div class="sc-row"><span class="sc-lbl">📞 Telefon</span><span class="sc-val m">${s.telefon || '—'}</span></div>
@@ -461,14 +466,32 @@ async function saveAE() {
 //  DAVOMAT SAHIFASIGA O'TISH
 // ─────────────────────────────────────────────
 function openTeachers() {
-  // Super admin boshqa adminni tanlagan bo'lsa, uning nomidan o'qituvchilarni ko'radi
-  const isProxy = U.isSuper && viewingAdmin;
-  const teacherUser = {
-    username: isProxy ? viewingAdmin.username : U.username,
-    parol:    isProxy ? viewingAdmin.parol    : U.parol,
-    ism:      isProxy ? viewingAdmin.ism      : U.ism,
-    isSuper:  false
-  };
+  let teacherUser;
+
+  if (viewingAdmin) {
+    // Biror maktab admin tanlangan → shu admin nomidan (proxy rejim, tahrirlash mumkin)
+    teacherUser = {
+      username:      viewingAdmin.username,
+      parol:         viewingAdmin.parol,
+      ism:           viewingAdmin.ism,
+      isSuper:       false,
+      isSuperProxy:  true,
+      superUsername: U.username,
+      superParol:    U.parol,
+      superIsm:      U.ism
+    };
+  } else {
+    // Hech kim tanlanmagan → super admin umumiy ko'rish rejimi (faqat o'qish)
+    teacherUser = {
+      username: U.username,
+      parol:    U.parol,
+      ism:      U.ism,
+      isSuper:  true,
+      // Maktab nomlari xaritalash uchun
+      adminsMap: JSON.stringify(ADMINS.map(a => ({ username: a.username, ism: a.ism })))
+    };
+  }
+
   sessionStorage.setItem('iit_teacher_user', JSON.stringify(teacherUser));
   window.location.href = 'oqituvchilar.html';
 }
