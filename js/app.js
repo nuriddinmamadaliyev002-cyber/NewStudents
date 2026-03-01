@@ -86,8 +86,12 @@ async function showApp() {
     g('tabs-row').style.display     = 'flex';
     g('admin-col').style.display    = '';
     g('admin-selector-wrap').style.display = 'flex';
+    // Super admin uchun Davomat tugmasini yashirish
+    g('btn-davomat').style.display = 'none';
     await loadAdmins();
     buildAdminSelector();
+  } else {
+    g('btn-davomat').style.display = '';
   }
 
   await loadStudents();
@@ -106,8 +110,8 @@ function switchTab(t) {
 // ─────────────────────────────────────────────
 function buildAdminSelector() {
   const sel = g('admin-selector');
-  sel.innerHTML = '<option value="">👁 O\'z o\'quvchilarim</option>' +
-    ADMINS.map(a => `<option value="${esc(a.username)}">${a.ism} (${a.username})</option>`).join('');
+  sel.innerHTML = '<option value="">👁 Barcha o\'quvchilar</option>' +
+    ADMINS.map(a => `<option value="${esc(a.username)}">${a.ism} (@${a.username})</option>`).join('');
   sel.value = viewingAdmin ? viewingAdmin.username : '';
 }
 
@@ -117,9 +121,13 @@ async function onAdminSelect() {
 
   if (!val) {
     viewingAdmin = null;
+    // Hech qaysi maktab tanlanmagan — Davomat yashiriq
+    g('btn-davomat').style.display = 'none';
   } else {
     const found = ADMINS.find(a => a.username === val);
-    viewingAdmin = found ? { username: found.username, ism: found.ism } : null;
+    viewingAdmin = found ? { username: found.username, ism: found.ism, parol: found.parol } : null;
+    // Maktab tanlangan — Davomat ko'rinadi
+    g('btn-davomat').style.display = '';
   }
 
   // O'quvchilar ro'yxatini qayta yuklash
@@ -446,16 +454,26 @@ async function saveAE() {
 //  DAVOMAT SAHIFASIGA O'TISH
 // ─────────────────────────────────────────────
 function openDavomat() {
-  // Joriy foydalanuvchi ma'lumotlarini sessionStorage ga saqlash
-  // (davomat.html uni o'qiydi)
+  // Super admin biror maktabni tanlamagan bo'lsa chiqish
+  if (U.isSuper && !viewingAdmin) {
+    toast('⚠️ Avval maktab tanlang!', 'error');
+    return;
+  }
+
+  // Davomat sahifasi uchun foydalanuvchi ma'lumotlari
+  // Super admin tanlagan maktab admini nomidan davomatga kiradi
+  const isProxy = U.isSuper && viewingAdmin;
   const davomatUser = {
-    username: U.username,
-    parol:    U.parol,
-    ism:      U.ism,
-    isSuper:  U.isSuper,
-    // Super admin boshqa adminni ko'rayotgan bo'lsa
-    viewingUsername: viewingAdmin ? viewingAdmin.username : null,
-    viewingIsm:      viewingAdmin ? viewingAdmin.ism      : null
+    // Agar super admin maktab tanlagan bo'lsa, shu maktab admini credentials bilan ishlaydi
+    username: isProxy ? viewingAdmin.username : U.username,
+    parol:    isProxy ? viewingAdmin.parol    : U.parol,
+    ism:      isProxy ? viewingAdmin.ism      : U.ism,
+    isSuper:  false, // davomat sahifasida proxy sifatida oddiy admin kabi ishlaydi
+    // Original super admin ma'lumotlarini saqlash (orqaga qaytish uchun)
+    isSuperProxy: isProxy,
+    superUsername: U.username,
+    superParol:    U.parol,
+    superIsm:      U.ism
   };
   sessionStorage.setItem('iit_davomat_user', JSON.stringify(davomatUser));
   window.location.href = 'davomat.html';
