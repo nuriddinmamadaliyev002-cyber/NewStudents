@@ -207,7 +207,20 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
           </div>
           <div class="field-group">
             <label class="field-label">Tug'ilgan sana</label>
-            <input class="field-input" type="date" id="f-tug">
+            <div style="display:grid;grid-template-columns:80px 1fr 100px;gap:8px;">
+              <input class="field-input" id="f-kun" type="number" placeholder="Kun" min="1" max="31" style="text-align:center;">
+              <select class="field-input" id="f-oy">
+                <option value="">— Oy —</option>
+                <option value="01">Yanvar</option><option value="02">Fevral</option>
+                <option value="03">Mart</option><option value="04">Aprel</option>
+                <option value="05">May</option><option value="06">Iyun</option>
+                <option value="07">Iyul</option><option value="08">Avgust</option>
+                <option value="09">Sentabr</option><option value="10">Oktabr</option>
+                <option value="11">Noyabr</option><option value="12">Dekabr</option>
+              </select>
+              <input class="field-input" id="f-yil" type="number" placeholder="Yil" min="2009" max="2019" style="text-align:center;">
+            </div>
+            <input type="hidden" id="f-tug">
           </div>
           <div class="field-group">
             <label class="field-label">Qo'shimcha telefon raqam</label>
@@ -766,9 +779,9 @@ function renderTable(data) {
       <td><strong>${s.ism}</strong> ${s.familiya}</td>
       <td class="mono">${s.telefon}</td>
       <td class="mono">${s.telefon2||'—'}</td>
-      <td class="mono">${s.tug ? new Date(s.tug).getFullYear() || s.tug : '—'}</td>
+      <td class="mono">${s.tug ? (String(s.tug).length >= 4 ? String(s.tug).substring(0,4) : s.tug) : '—'}</td>
       <td>${s.maktab||'—'}</td>
-      <td><span class="sinf-badge">${s.sinf}</span></td>
+      <td><span class="sinf-badge">${s.sinf||'—'}</span></td>
       <td>${s.manzil||'—'}</td>
       ${showAdmin ? `<td class="mono" style="font-size:11px;">${s.admin||'—'}</td>` : ''}
       <td class="mono">${formatDate(s.date)}</td>
