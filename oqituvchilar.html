@@ -16,7 +16,7 @@
   <div class="topbar-right">
     <span class="admin-badge" id="admin-badge"></span>
     <span class="stat-badge"  id="total-count">0</span>
-    <button class="btn-davomat" onclick="openDavomat()">📋 Davomat</button>
+    <button class="btn-davomat" id="btn-davomat-teacher" onclick="openDavomat()">📋 Davomat</button>
     <button class="btn-logout"  onclick="goBack()">← Orqaga</button>
   </div>
 </div>
@@ -118,12 +118,13 @@
           <th>#</th>
           <th>Ism Familiya</th>
           <th>Fan</th>
+          <th id="th-maktab" style="display:none;">Maktab</th>
           <th>Sinflar</th>
           <th>Dars kunlari</th>
           <th>Vaqt</th>
           <th>Telefon</th>
           <th>Qo'sh. tel</th>
-          <th>Amal</th>
+          <th id="th-amal">Amal</th>
         </tr></thead>
         <tbody id="tbl-body"></tbody>
       </table>
