@@ -124,11 +124,10 @@ function applyFilter() {
 
 function renderTable(d) {
   const tb       = g('tbl-body');
-  const isSuper  = U && U.isSuper;       // umumiy ko'rish (faqat o'qish + Maktab ustuni)
-  const isProxy  = U && U.isSuperProxy;  // biror maktab proxy (o'qish, lekin Maktab yo'q)
-  const isAdmin  = !isSuper && !isProxy; // oddiy admin (to'liq huquq)
+  const isSuper  = U && U.isSuper;
+  const isProxy  = U && U.isSuperProxy;
+  const isAdmin  = !isSuper && !isProxy;
 
-  // Jadval boshliqlari ko'rinishini yangilash
   const thAmal   = g('th-amal');
   const thMaktab = g('th-maktab');
   if (isSuper) {
@@ -214,34 +213,29 @@ async function addTeacher() {
   const tel2   = g('f-tel2').value.trim();
   const kunlar = getSelectedDays('f-kunlar');
   const sinflar= getSelectedSinfs('f-sinflar');
-  const boshS  = padZ(g('f-bosh-s').value); const boshM = padZ(g('f-bosh-m').value);
-  const tugS   = padZ(g('f-tug-s').value);  const tugM  = padZ(g('f-tug-m').value);
+  const boshlanish = padZ(g('f-bosh-s').value) + ':' + padZ(g('f-bosh-m').value);
+  const tugash     = padZ(g('f-tug-s').value)  + ':' + padZ(g('f-tug-m').value);
 
-  if (!ism || !fam)       { toast('⚠️ Ism va familiya kiriting', 'error'); return; }
-  if (!fan)               { toast('⚠️ Fan tanlang', 'error'); return; }
-  if (!tel)               { toast('⚠️ Telefon kiriting', 'error'); return; }
-  if (!isTelOk(tel))      { toast('⚠️ Telefon formati noto\'g\'ri', 'error'); return; }
-  if (tel2 && !isTelOk(tel2)) { toast('⚠️ Qo\'sh. telefon formati noto\'g\'ri', 'error'); return; }
-  if (!kunlar.length)     { toast('⚠️ Kamida 1 kun tanlang', 'error'); return; }
-  if (!sinflar.length)    { toast('⚠️ Kamida 1 sinf tanlang', 'error'); return; }
-
-  const boshlanish = boshS + ':' + boshM;
-  const tugash     = tugS  + ':' + tugM;
+  if (!ism||!fam)     { toast('⚠️ Ism va familiya kiriting','error'); return; }
+  if (!fan)           { toast('⚠️ Fan tanlang','error'); return; }
+  if (!tel)           { toast('⚠️ Telefon kiriting','error'); return; }
+  if (!isTelOk(tel))  { toast('⚠️ Telefon formati noto\'g\'ri','error'); return; }
+  if (tel2 && !isTelOk(tel2)) { toast('⚠️ Qo\'sh. telefon formati noto\'g\'ri','error'); return; }
+  if (!kunlar.length) { toast('⚠️ Kamida 1 kun tanlang','error'); return; }
+  if (!sinflar.length){ toast('⚠️ Kamida 1 sinf tanlang','error'); return; }
 
   bl('submit-btn', 'spinner', 'btn-txt', true, 'Saqlanmoqda…');
   try {
     const r = await req({
       action: 'addTeacher', username: U.username, parol: U.parol,
-      ism, familiya: fam, fan, telefon: tel, telefon2: tel2||'',
+      ism, familiya: fam, fan,
+      telefon: tel, telefon2: tel2||'',
       kunlar: kunlar.join(','), sinflar: sinflar.join(','),
       boshlanish, tugash,
       date: new Date().toLocaleDateString('uz-UZ')
     });
-    if (r.ok) {
-      clearForm();
-      await loadTeachers();
-      toast("✅ O'qituvchi qo'shildi!", 'success');
-    } else toast('❌ ' + r.error, 'error');
+    if (r.ok) { clearForm(); await loadTeachers(); toast("✅ O'qituvchi qo'shildi!", 'success'); }
+    else toast('❌ ' + r.error, 'error');
   } catch { toast('❌ Xatolik', 'error'); }
   bl('submit-btn', 'spinner', 'btn-txt', false, 'Saqlash');
 }
@@ -281,7 +275,7 @@ function openEdit(idx) {
     c.classList.toggle('sel', sinflar.includes(c.dataset.s));
   });
 
-  // Vaqt
+  // Vaqt — fmtVaqt orqali parse qilingan qiymat allaqachon "HH:MM" formatida keladi
   const [bS,bM] = (t.boshlanish||'08:00').split(':');
   const [tS,tM] = (t.tugash    ||'14:00').split(':');
   g('e-bosh-s').value=bS||'08'; g('e-bosh-m').value=bM||'00';
@@ -431,10 +425,27 @@ function setupTel(inpId, hintId) {
   inp.addEventListener('blur', () => validateTel(inp, hint));
 }
 
+// ─── FIX: Google Sheets vaqtni Date object sifatida yuboradi ───
+// Bu funksiya "1899-12-30T08:00:00.000Z" → "08:00" formatiga o'giradi
 function fmtVaqt(b, t) {
   if (!b && !t) return '—';
-  return (b||'?') + '–' + (t||'?');
+
+  function parseVaqt(v) {
+    if (!v) return '?';
+    const s = String(v);
+    // Allaqachon "HH:MM" formatida bo'lsa — to'g'ridan qaytarish
+    if (/^\d{1,2}:\d{2}$/.test(s)) return s;
+    // Google Sheets Date string bo'lsa — UTC soat/daqiqani olish
+    const d = new Date(s);
+    if (!isNaN(d)) {
+      return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+    }
+    return s;
+  }
+
+  return parseVaqt(b) + '–' + parseVaqt(t);
 }
+
 function padZ(v) { return String(parseInt(v)||0).padStart(2,'0'); }
 function bl(btnId, spId, txtId, loading, txt) {
   if(btnId) g(btnId).disabled = loading;
