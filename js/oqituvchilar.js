@@ -7,9 +7,10 @@ const API = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8q
 const KUN_NAMES = ['', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
 const KUN_SHORT = ['', 'Du', 'Se', 'Cho', 'Pay', 'Ju', 'Sha'];
 
-let U  = null;   // { username, parol, ism, isSuper }
-let T  = [];     // Barcha o'qituvchilar
-let eIdx = null; // Tahrirlash indexi
+let U          = null;   // { username, parol, ism, isSuper }
+let T          = [];     // Barcha o'qituvchilar
+let eIdx       = null;   // Tahrirlash indexi
+let ADMINS_MAP = {};     // { username: ism } — super admin uchun maktab nomlari
 
 // ─────────────────────────────────────────────
 //  YUKLANGANDA
@@ -23,8 +24,31 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Badge
   const badge = g('admin-badge');
-  badge.textContent = U.ism;
-  if (U.isSuper) { badge.classList.add('super'); badge.textContent = '⭐ ' + U.ism; }
+  if (U.isSuper) {
+    badge.classList.add('super');
+    badge.textContent = '⭐ ' + U.ism;
+  } else if (U.isSuperProxy) {
+    badge.classList.add('super');
+    badge.textContent = '🏫 ' + U.ism;
+  } else {
+    badge.textContent = U.ism;
+  }
+
+  // Super admin umumiy ko'rish rejimi: form va davomat yashiriq
+  if (U.isSuper) {
+    const addForm = g('add-form');
+    if (addForm) addForm.style.display = 'none';
+    const btnDav = g('btn-davomat-teacher');
+    if (btnDav) btnDav.style.display = 'none';
+  }
+
+  // Super admin proxy (biror maktab tanlangan): faqat o'qituvchilar ko'rinadi, davomat yo'q
+  if (U.isSuperProxy) {
+    const addForm = g('add-form');
+    if (addForm) addForm.style.display = 'none';
+    const btnDav = g('btn-davomat-teacher');
+    if (btnDav) btnDav.style.display = 'none';
+  }
 
   // Chip clicklar
   setupChips('f-kunlar',  'kun-chip');
@@ -64,6 +88,14 @@ function openDavomat() {
 // ─────────────────────────────────────────────
 async function loadTeachers() {
   g('loading-ov').style.display = 'flex';
+  // Super admin uchun admins map yuklash
+  if (U.isSuper && U.adminsMap) {
+    try {
+      const list = JSON.parse(U.adminsMap);
+      list.forEach(a => { ADMINS_MAP[a.username] = a.ism; });
+    } catch(e) {}
+  }
+
   try {
     const d = await req({ action: 'getTeachers', username: U.username, parol: U.parol });
     if (d.ok) {
@@ -91,29 +123,47 @@ function applyFilter() {
 }
 
 function renderTable(d) {
-  const tb = g('tbl-body');
+  const tb       = g('tbl-body');
+  const isSuper  = U && U.isSuper;       // umumiy ko'rish (faqat o'qish + Maktab ustuni)
+  const isProxy  = U && U.isSuperProxy;  // biror maktab proxy (o'qish, lekin Maktab yo'q)
+  const isAdmin  = !isSuper && !isProxy; // oddiy admin (to'liq huquq)
+
+  // Jadval boshliqlari ko'rinishini yangilash
+  const thAmal   = g('th-amal');
+  const thMaktab = g('th-maktab');
+  if (isSuper) {
+    if (thAmal)   thAmal.style.display   = 'none';
+    if (thMaktab) thMaktab.style.display = '';
+  } else {
+    if (thAmal)   thAmal.style.display   = '';
+    if (thMaktab) thMaktab.style.display = 'none';
+  }
+
   if (!d.length) {
     tb.innerHTML = `<tr><td colspan="9"><div class="empty-state">
       <div class="empty-state-icon">👩‍🏫</div><p>O'qituvchi topilmadi</p></div></td></tr>`;
     return;
   }
-  const todayDay = new Date().getDay(); // 0=Ya, 1=Du … 6=Sha
+
+  const todayDay = new Date().getDay();
   tb.innerHTML = d.map((t, i) => {
-    const kunlar = parseDays(t.kunlar);
+    const kunlar  = parseDays(t.kunlar);
     const sinflar = parseSinflar(t.sinflar);
+    const maktabNom = ADMINS_MAP[t.admin] || t.admin || '—';
     return `<tr>
       <td class="mono">${i+1}</td>
       <td><strong>${t.ism}</strong> ${t.familiya}</td>
       <td><span class="fan-badge">${t.fan || '—'}</span></td>
+      ${isSuper ? `<td style="font-size:12px;color:var(--muted);">${maktabNom}</td>` : ''}
       <td><div class="sinf-tags">${sinflar.map(s=>`<span class="sinf-tag">${s}</span>`).join('')}</div></td>
       <td><div class="kun-tags">${kunlar.map(k=>`<span class="kun-tag${k==todayDay?' today':''}">${KUN_SHORT[k]}</span>`).join('')}</div></td>
       <td><span class="vaqt-badge">${fmtVaqt(t.boshlanish, t.tugash)}</span></td>
       <td class="mono">${t.telefon||'—'}</td>
       <td class="mono">${t.telefon2||'—'}</td>
-      <td><div style="display:flex;gap:6px;">
+      ${isAdmin ? `<td><div style="display:flex;gap:6px;">
         <button class="btn-action" onclick="openEdit(${t.ri})">✏️</button>
         <button class="btn-action" onclick="delT(${t.ri},'${esc(t.ism+' '+t.familiya)}')">🗑️</button>
-      </div></td>
+      </div></td>` : ''}
     </tr>`;
   }).join('');
 }
@@ -124,20 +174,23 @@ function renderMobile(d) {
     el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👩‍🏫</div><p>O\'qituvchi topilmadi</p></div>';
     return;
   }
+  const isSuper = U && U.isSuper;
+  const isAdmin = !isSuper && !(U && U.isSuperProxy);
   const todayDay = new Date().getDay();
   el.innerHTML = d.map((t, i) => {
-    const kunlar  = parseDays(t.kunlar);
-    const sinflar = parseSinflar(t.sinflar);
+    const kunlar    = parseDays(t.kunlar);
+    const sinflar   = parseSinflar(t.sinflar);
+    const maktabNom = ADMINS_MAP[t.admin] || t.admin || '—';
     return `<div class="tc">
       <div class="tc-head">
         <div>
           <div class="tc-name">${t.ism} ${t.familiya}</div>
-          <div class="tc-sub">#${i+1} · <span class="fan-badge">${t.fan||'—'}</span></div>
+          <div class="tc-sub">#${i+1} · <span class="fan-badge">${t.fan||'—'}</span>${isSuper ? ` · <span style="font-size:10px;color:var(--muted);">${maktabNom}</span>` : ''}</div>
         </div>
-        <div class="tc-btns">
+        ${isAdmin ? `<div class="tc-btns">
           <button class="btn-action" onclick="openEdit(${t.ri})">✏️</button>
           <button class="btn-action" onclick="delT(${t.ri},'${esc(t.ism+' '+t.familiya)}')">🗑️</button>
-        </div>
+        </div>` : ''}
       </div>
       <div class="tc-body">
         <div class="tc-row"><span class="tc-lbl">📞 Telefon</span><span class="tc-val mono">${t.telefon||'—'}</span></div>
