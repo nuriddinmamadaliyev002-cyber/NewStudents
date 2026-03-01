@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InnovateIT School — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1917;
+    --muted: #7a7870;
+    --accent: #2563eb;
+    --accent-soft: #eff4ff;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --success-soft: #f0fdf4;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ─── LOGIN ─── */
+  #login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.4s ease;
+  }
+
+  .login-logo {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .login-logo::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .login-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .login-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  .field-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    background: #fff;
+  }
+
+  .field-group { margin-bottom: 18px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 11px;
+    background: var(--text);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+    display: none;
+  }
+
+  /* ─── APP ─── */
+  #app { display: none; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-brand {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-brand::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+  .stat-badge {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .btn-logout {
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ─── FORM CARD ─── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  .form-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .form-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+  }
+
+  .form-card-sub { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-grid .span-2 { grid-column: span 2; }
+
+  @media(max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .span-2 { grid-column: span 1; }
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 8px;
+  }
+
+  .btn-submit:hover { background: #1d4ed8; }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+
+  /* ─── TABLE ─── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .table-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .table-title { font-size: 15px; font-weight: 600; }
+
+  .search-input {
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    width: 200px;
+    transition: all 0.15s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    width: 240px;
+    background: white;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+
+  tbody td {
+    padding: 13px 16px;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+
+  .mono { font-family: 'DM Mono', monospace; font-size: 12.5px; color: var(--muted); }
+
+  .sinf-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 56px 24px;
+    color: var(--muted);
+  }
+
+  .empty-state-icon { font-size: 32px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  .config-notice {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #92400e;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  select.field-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7870' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">InnovateIT School</div>
+    <h1 class="login-title">Admin Panel</h1>
+    <p class="login-sub">Davom etish uchun parolni kiriting</p>
+
+    <div class="field-group">
+      <label class="field-label" for="password-input">Parol</label>
+      <input class="field-input" type="password" id="password-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn-primary" onclick="checkLogin()">Kirish</button>
+    <p class="error-msg" id="login-error">❌ Parol noto'g'ri</p>
+  </div>
+</div>
+
+<!-- ─── APP ─── -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">InnovateIT School</div>
+    <div class="topbar-right">
+      <span class="stat-badge" id="total-count">0 o'quvchi</span>
+      <button class="btn-logout" onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="config-notice" id="config-notice">
+      ⚙️ <span>Google Sheets bilan ulanish uchun <strong>Apps Script URL</strong> ni sozlash kerak. Buning uchun <code>APPS_SCRIPT_URL</code> konstantasini o'zgartiring (quyida ko'rsatilgan yo'riqnomaga qarang).</span>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-title">➕ Yangi o'quvchi qo'shish</div>
+        <span class="form-card-sub">Barcha maydonlar to'ldirilsin</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label" for="f-ism">Ism</label>
+          <input class="field-input" type="text" id="f-ism" placeholder="Sardor">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-familiya">Familiya</label>
+          <input class="field-input" type="text" id="f-familiya" placeholder="Karimov">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-telefon">Telefon raqam</label>
+          <input class="field-input" type="tel" id="f-telefon" placeholder="+998 90 123 45 67">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-tug">Tug'ilgan sana</label>
+          <input class="field-input" type="date" id="f-tug">
+        </div>
+        <div class="field-group span-2">
+          <label class="field-label" for="f-sinf">Sinfi</label>
+          <select class="field-input" id="f-sinf">
+            <option value="">— Tanlang —</option>
+            <option>1-sinf</option><option>2-sinf</option><option>3-sinf</option>
+            <option>4-sinf</option><option>5-sinf</option><option>6-sinf</option>
+            <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
+            <option>10-sinf</option><option>11-sinf</option>
+            <option>Kurs (kattalar)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="submit-btn" onclick="addStudent()">
+        <span class="spinner" id="spinner"></span>
+        <span id="btn-text">Saqlash</span>
+      </button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">O'quvchilar ro'yxati</div>
+        <input class="search-input" type="text" placeholder="Qidirish…" oninput="filterTable(this.value)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Ism Familiya</th>
+            <th>Telefon</th>
+            <th>Tug'ilgan sana</th>
+            <th>Sinfi</th>
+            <th>Qo'shilgan</th>
+          </tr>
+        </thead>
+        <tbody id="student-table-body">
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <p>Hali o'quvchi qo'shilmagan</p>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ⚙️  SOZLAMALAR — shu joyni o'zgartiring
+// ══════════════════════════════════════════════════
+const ADMIN_PASSWORD = "innovate2026";          // 🔑 Parolni shu yerdan o'zgartiring
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE"; // 📋 Apps Script URL ni shu yerga joylashtiring
+// ══════════════════════════════════════════════════
+
+let students = JSON.parse(localStorage.getItem('innovateit_students') || '[]');
+
+// ─── Auth ───
+document.getElementById('password-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkLogin();
+});
+
+function checkLogin() {
+  const val = document.getElementById('password-input').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderTable(students);
+    updateCount();
+    if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      document.getElementById('config-notice').style.display = 'none';
+    }
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('password-input').value = '';
+    document.getElementById('password-input').focus();
+  }
+}
+
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('password-input').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// ─── Add student ───
+async function addStudent() {
+  const ism      = document.getElementById('f-ism').value.trim();
+  const familiya = document.getElementById('f-familiya').value.trim();
+  const telefon  = document.getElementById('f-telefon').value.trim();
+  const tug      = document.getElementById('f-tug').value;
+  const sinf     = document.getElementById('f-sinf').value;
+
+  if (!ism || !familiya || !telefon || !tug || !sinf) {
+    showToast('⚠️ Barcha maydonlarni to'ldiring', 'error');
+    return;
+  }
+
+  const student = {
+    id: Date.now(),
+    ism, familiya, telefon, tug, sinf,
+    date: new Date().toLocaleDateString('uz-UZ')
+  };
+
+  setLoading(true);
+
+  // Google Sheets ga yuborish
+  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+    } catch (e) {
+      console.warn('Sheets error:', e);
+    }
+  }
+
+  // Local cache ga saqlash
+  students.unshift(student);
+  localStorage.setItem('innovateit_students', JSON.stringify(students));
+
+  setLoading(false);
+  clearForm();
+  renderTable(students);
+  updateCount();
+  showToast('✅ O\'quvchi muvaffaqiyatli qo\'shildi!', 'success');
+}
+
+function setLoading(state) {
+  document.getElementById('submit-btn').disabled = state;
+  document.getElementById('spinner').style.display = state ? 'block' : 'none';
+  document.getElementById('btn-text').textContent = state ? 'Saqlanmoqda…' : 'Saqlash';
+}
+
+function clearForm() {
+  ['f-ism','f-familiya','f-telefon','f-tug','f-sinf'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// ─── Table ───
+function renderTable(data) {
+  const tbody = document.getElementById('student-table-body');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6">
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>Hali o'quvchi qo'shilmagan</p>
+      </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map((s, i) => `
+    <tr>
+      <td class="mono">${i + 1}</td>
+      <td><strong>${s.ism}</strong> ${s.familiya}</td>
+      <td class="mono">${s.telefon}</td>
+      <td class="mono">${formatDate(s.tug)}</td>
+      <td><span class="sinf-badge">${s.sinf}</span></td>
+      <td class="mono">${s.date}</td>
+    </tr>`).join('');
+}
+
+function filterTable(q) {
+  const filtered = students.filter(s =>
+    (s.ism + ' ' + s.familiya + ' ' + s.telefon + ' ' + s.sinf)
+      .toLowerCase().includes(q.toLowerCase())
+  );
+  renderTable(filtered);
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${day}.${m}.${y}`;
+}
+
+function updateCount() {
+  document.getElementById('total-count').textContent = students.length + ' o\'quvchi';
+}
+
+// ─── Toast ───
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+</script>
+</body>
+</html>
