@@ -438,7 +438,7 @@
 
   <div class="main">
 
-    <div class="config-notice" id="config-notice">
+    <div class="config-notice" id="config-notice" style="display:none">
       ⚙️ <span>Google Sheets bilan ulanish uchun <strong>Apps Script URL</strong> ni sozlash kerak. Buning uchun <code>APPS_SCRIPT_URL</code> konstantasini o'zgartiring (quyida ko'rsatilgan yo'riqnomaga qarang).</span>
     </div>
 
@@ -523,7 +523,7 @@
 //  ⚙️  SOZLAMALAR — shu joyni o'zgartiring
 // ══════════════════════════════════════════════════
 const ADMIN_PASSWORD = "innovate2026";          // 🔑 Parolni shu yerdan o'zgartiring
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1P4aH1buQdzT2kEtYsT_9l_py10cJyUOzRWEPrzn5rRCKa_srqf1LaqWoisk9QZ4GNg/exec"; // 📋 Apps Script URL ni shu yerga joylashtiring
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE"; // 📋 Apps Script URL ni shu yerga joylashtiring
 // ══════════════════════════════════════════════════
 
 let students = JSON.parse(localStorage.getItem('innovateit_students') || '[]');
@@ -566,7 +566,7 @@ async function addStudent() {
   const sinf     = document.getElementById('f-sinf').value;
 
   if (!ism || !familiya || !telefon || !tug || !sinf) {
-    showToast('⚠️ Barcha maydonlarni to'ldiring', 'error');
+    showToast("⚠️ Barcha maydonlarni to'ldiring", 'error');
     return;
   }
 
