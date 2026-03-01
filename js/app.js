@@ -1,0 +1,505 @@
+// ═══════════════════════════════════════════════════
+//  InnovateIT School — Frontend JavaScript
+// ═══════════════════════════════════════════════════
+
+const API = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8qFV81dHH1QPMkFezQENr6S33bn07dLpK_l7fOw1pmHg/exec";
+
+// Global holat
+let U = null; // Joriy foydalanuvchi
+let S = [];   // O'quvchilar ro'yxati
+
+// ─────────────────────────────────────────────
+//  ILOVA YUKLANGANDA
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const saved = localStorage.getItem('iit_u');
+    if (saved) {
+      U = JSON.parse(saved);
+      await showApp();
+    }
+  } catch (e) {
+    localStorage.removeItem('iit_u');
+  }
+});
+
+// ─────────────────────────────────────────────
+//  LOGIN / LOGOUT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inp-parol').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+async function doLogin() {
+  const email = g('inp-email').value.trim();
+  const parol = g('inp-parol').value;
+  if (!email || !parol) return;
+
+  const btn = g('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Tekshirilmoqda…';
+
+  try {
+    const r = await req({ action: 'login', email, parol });
+    if (r.ok) {
+      U = { email, parol, ism: r.ism, isSuper: r.isSuper };
+      localStorage.setItem('iit_u', JSON.stringify(U));
+      showApp();
+    } else {
+      const el = g('login-err');
+      el.textContent = '❌ ' + (r.error || "Noto'g'ri");
+      el.style.display = 'block';
+    }
+  } catch (e) {
+    const el = g('login-err');
+    el.textContent = '❌ Ulanishda xatolik';
+    el.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Kirish';
+}
+
+function doLogout() {
+  U = null;
+  S = [];
+  localStorage.removeItem('iit_u');
+  g('app').style.display = 'none';
+  g('login-screen').style.display = 'flex';
+  g('inp-email').value = '';
+  g('inp-parol').value = '';
+  g('login-err').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+//  APP KO'RINISHI
+// ─────────────────────────────────────────────
+async function showApp() {
+  g('login-screen').style.display = 'none';
+  g('app').style.display = 'block';
+
+  const b = g('admin-badge');
+  b.textContent = U.ism;
+
+  if (U.isSuper) {
+    b.classList.add('super');
+    b.textContent = '⭐ ' + U.ism;
+    g('tabs-row').style.display = 'flex';
+    g('admin-col').style.display = '';
+    loadAdmins();
+  }
+
+  await loadStudents();
+}
+
+function switchTab(t) {
+  g('tab-s').style.display = t === 's' ? 'block' : 'none';
+  g('tab-a').style.display = t === 'a' ? 'block' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b, i) =>
+    b.classList.toggle('active', (i === 0 && t === 's') || (i === 1 && t === 'a'))
+  );
+}
+
+// ─────────────────────────────────────────────
+//  O'QUVCHILAR
+// ─────────────────────────────────────────────
+async function loadStudents() {
+  g('loading-ov').style.display = 'flex';
+  try {
+    const d = await req({ action: 'getStudents', email: U.email, parol: U.parol });
+    if (d.ok) {
+      S = d.students;
+      S.forEach((s, i) => s.ri = i);
+      updMaktabF();
+      applyFilters();
+      g('total-count').textContent = S.length + " o'quvchi";
+    }
+  } catch (e) {
+    toast("❌ Ma'lumotlar yuklanmadi", 'error');
+  }
+  g('loading-ov').style.display = 'none';
+}
+
+async function addStudent() {
+  const ism    = g('f-ism').value.trim();
+  const fam    = g('f-familiya').value.trim();
+  const maktab = getM('f-maktab');
+  const sinf   = g('f-sinf').value;
+  const tel    = g('f-tel').value.trim();
+  const tel2   = g('f-tel2').value.trim();
+  const manzil = g('f-manzil').value.trim();
+  const kun    = String(g('f-kun').value || '').padStart(2, '0');
+  const oy     = g('f-oy').value;
+  const yil    = g('f-yil').value;
+
+  if (yil && (yil < 2009 || yil > 2019)) { toast("⚠️ Yil 2009–2019 bo'lishi kerak", 'error'); return; }
+  if (yil && oy && kun) g('f-tug').value = yil + '-' + oy + '-' + kun;
+  const tug = g('f-tug').value;
+
+  if (!ism || !fam) { toast("⚠️ Ism va familiya kiriting", 'error'); return; }
+  if (!maktab)      { toast("⚠️ Maktab raqami 1–99", 'error'); g('f-maktab').classList.add('err'); return; }
+  if (!sinf)        { toast("⚠️ Sinf tanlang", 'error'); return; }
+  if (!tel)         { toast("⚠️ Telefon kiriting", 'error'); return; }
+  if (!tug)         { toast("⚠️ Tug'ilgan sana kiriting", 'error'); return; }
+
+  bl('submit-btn', 'spinner', 'btn-txt', true, 'Saqlanmoqda…');
+  try {
+    const r = await req({
+      action: 'addStudent', email: U.email, parol: U.parol,
+      ism, familiya: fam, maktab, sinf,
+      telefon: tel, telefon2: tel2, manzil, tug,
+      date: new Date().toLocaleDateString('uz-UZ')
+    });
+    if (r.ok) { clearF(); await loadStudents(); toast("✅ O'quvchi qo'shildi!", 'success'); }
+    else toast('❌ ' + r.error, 'error');
+  } catch (e) { toast('❌ Xatolik', 'error'); }
+  bl('submit-btn', 'spinner', 'btn-txt', false, 'Saqlash');
+}
+
+// ── Filter & Render ──
+function applyFilters() {
+  const q  = (g('f-search').value || '').toLowerCase();
+  const fm = g('f-maktab-f').value;
+  const fs = g('f-sinf-f').value;
+  const d  = S.filter(s =>
+    (!q  || (s.ism + ' ' + s.familiya + ' ' + s.telefon).toLowerCase().includes(q)) &&
+    (!fm || String(s.maktab) === String(fm)) &&
+    (!fs || s.sinf === fs)
+  );
+  renderTbl(d);
+  renderMob(d);
+}
+
+function renderTbl(d) {
+  const tb  = g('tbl-body');
+  const sup = U && U.isSuper;
+  if (!d.length) {
+    tb.innerHTML = `<tr><td colspan="${sup ? 11 : 10}">
+      <div class="empty-state"><div class="empty-state-icon">📋</div><p>O'quvchi topilmadi</p></div>
+    </td></tr>`;
+    return;
+  }
+  tb.innerHTML = d.map((s, i) => `<tr>
+    <td class="mono">${i + 1}</td>
+    <td><strong>${s.ism}</strong> ${s.familiya}</td>
+    <td><span class="maktab-badge">${s.maktab || '—'}</span></td>
+    <td><span class="sinf-badge">${s.sinf || '—'}</span></td>
+    <td class="mono">${s.telefon || '—'}</td>
+    <td class="mono">${s.telefon2 || '—'}</td>
+    <td class="mono">${fTug(s.tug)}</td>
+    <td>${s.manzil || '—'}</td>
+    ${sup ? `<td class="mono" style="font-size:11px;">${s.admin || '—'}</td>` : ''}
+    <td class="mono">${fDate(s.date)}</td>
+    <td><div style="display:flex;gap:6px;">
+      <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
+      <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism + ' ' + s.familiya)}')">🗑️</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderMob(d) {
+  const el  = g('mob-cards');
+  const sup = U && U.isSuper;
+  if (!d.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>O\'quvchi topilmadi</p></div>';
+    return;
+  }
+  el.innerHTML = d.map((s, i) => `
+    <div class="sc">
+      <div class="sc-header">
+        <div>
+          <div class="sc-name">${s.ism} ${s.familiya}</div>
+          <div class="sc-num">#${i + 1}</div>
+          <div class="sc-tags">
+            <span class="maktab-badge">${s.maktab || '—'}-maktab</span>
+            <span class="sinf-badge">${s.sinf || '—'}</span>
+          </div>
+        </div>
+        <div class="sc-btns">
+          <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
+          <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism + ' ' + s.familiya)}')">🗑️</button>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-row"><span class="sc-lbl">📞 Telefon</span><span class="sc-val m">${s.telefon || '—'}</span></div>
+        <div class="sc-row"><span class="sc-lbl">📞 Qo'sh.</span><span class="sc-val m">${s.telefon2 || '—'}</span></div>
+        <div class="sc-row"><span class="sc-lbl">🎂 Tug'ilgan</span><span class="sc-val m">${fTug(s.tug)}</span></div>
+        <div class="sc-row"><span class="sc-lbl">📍 Manzil</span><span class="sc-val">${s.manzil || '—'}</span></div>
+        ${sup ? `<div class="sc-row sc-full"><span class="sc-lbl">👤 Admin</span><span class="sc-val m" style="font-size:11px;">${s.admin || '—'}</span></div>` : ''}
+        <div class="sc-row"><span class="sc-lbl">📅 Sana</span><span class="sc-val m">${fDate(s.date)}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function updMaktabF() {
+  const sel  = g('f-maktab-f');
+  const cur  = sel.value;
+  const list = [...new Set(S.map(s => s.maktab).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
+  sel.innerHTML = '<option value="">Barcha maktab</option>' +
+    list.map(m => `<option${String(m) === String(cur) ? ' selected' : ''}>${m}</option>`).join('');
+}
+
+// ── O'quvchini tahrirlash (modal) ──
+let eIdx = null;
+
+function openES(idx) {
+  const s = S[idx];
+  if (!s) return;
+  eIdx = idx;
+
+  g('e-ism').value      = s.ism      || '';
+  g('e-familiya').value = s.familiya || '';
+  g('e-maktab').value   = s.maktab   || '';
+  g('e-sinf').value     = s.sinf     || '';
+  g('e-tel').value      = s.telefon  || '';
+  g('e-tel2').value     = s.telefon2 || '';
+  g('e-manzil').value   = s.manzil   || '';
+
+  if (s.tug) {
+    const d = new Date(s.tug);
+    if (!isNaN(d)) {
+      g('e-kun').value = d.getDate();
+      g('e-oy').value  = String(d.getMonth() + 1).padStart(2, '0');
+      g('e-yil').value = d.getFullYear();
+      g('e-tug').value = d.toISOString().split('T')[0];
+    }
+  } else {
+    ['e-kun', 'e-oy', 'e-yil', 'e-tug'].forEach(id => g(id).value = '');
+  }
+
+  g('es-modal').style.display = 'flex';
+}
+
+function closeES() {
+  g('es-modal').style.display = 'none';
+  eIdx = null;
+}
+
+async function saveES() {
+  const ism    = g('e-ism').value.trim();
+  const fam    = g('e-familiya').value.trim();
+  const maktab = getM('e-maktab');
+  const sinf   = g('e-sinf').value;
+  const tel    = g('e-tel').value.trim();
+  const tel2   = g('e-tel2').value.trim();
+  const manzil = g('e-manzil').value.trim();
+  const kun    = String(g('e-kun').value || '').padStart(2, '0');
+  const oy     = g('e-oy').value;
+  const yil    = g('e-yil').value;
+
+  if (yil && (yil < 2009 || yil > 2019)) { toast("⚠️ Yil 2009–2019 bo'lishi kerak", 'error'); return; }
+  if (yil && oy && kun) g('e-tug').value = yil + '-' + oy + '-' + kun;
+  const tug = g('e-tug').value;
+
+  if (!ism || !fam) { toast("⚠️ Ism va familiya kiriting", 'error'); return; }
+  if (!maktab)      { toast("⚠️ Maktab raqami 1–99", 'error'); return; }
+  if (!sinf)        { toast("⚠️ Sinf tanlang", 'error'); return; }
+  if (!tel)         { toast("⚠️ Telefon kiriting", 'error'); return; }
+
+  const s = S[eIdx];
+  bl('es-save', 'es-spinner', 'es-btn-txt', true, 'Saqlanmoqda…');
+  try {
+    const r = await req({
+      action: 'editStudent', email: U.email, parol: U.parol,
+      oldIsm: s.ism, oldFamiliya: s.familiya,
+      ism, familiya: fam, maktab, sinf,
+      telefon: tel, telefon2: tel2, manzil, tug
+    });
+    if (r.ok) { closeES(); await loadStudents(); toast("✅ O'quvchi yangilandi!", 'success'); }
+    else toast('❌ ' + r.error, 'error');
+  } catch (e) { toast('❌ Xatolik', 'error'); }
+  bl('es-save', 'es-spinner', 'es-btn-txt', false, 'Saqlash');
+}
+
+async function delS(idx, name) {
+  if (!confirm(`"${name}" o'chirilsinmi?`)) return;
+  const s = S[idx];
+  try {
+    const r = await req({ action: 'deleteStudent', email: U.email, parol: U.parol, delIsm: s.ism, delFamiliya: s.familiya });
+    if (r.ok) { await loadStudents(); toast("✅ O'quvchi o'chirildi", 'success'); }
+    else toast('❌ ' + r.error, 'error');
+  } catch (e) {}
+}
+
+// ─────────────────────────────────────────────
+//  ADMINLAR
+// ─────────────────────────────────────────────
+async function loadAdmins() {
+  try {
+    const d = await req({ action: 'getAdmins', email: U.email, parol: U.parol });
+    if (d.ok) renderAdmins(d.admins);
+  } catch (e) {}
+}
+
+function renderAdmins(admins) {
+  const el = g('admin-list');
+  if (!admins.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><p>Admin yo\'q</p></div>';
+    return;
+  }
+  el.innerHTML = admins.map(a => `
+    <div class="admin-item">
+      <div class="admin-info">
+        <span class="admin-name">${a.ism}</span>
+        <span class="admin-email">${a.email}</span>
+        <span class="admin-ptag">🔑 ${a.parol || '—'}</span>
+      </div>
+      <div class="admin-acts">
+        <button class="btn-action" onclick="openAE('${esc(a.email)}','${esc(a.ism)}','${esc(a.parol || '')}')">✏️</button>
+        <button class="btn-small"  onclick="delA('${esc(a.email)}','${esc(a.ism)}')">O'chirish</button>
+      </div>
+    </div>`).join('');
+}
+
+async function createAdmin() {
+  const ism   = g('a-ism').value.trim();
+  const email = g('a-email').value.trim();
+  const parol = g('a-parol').value.trim();
+  if (!ism || !email || !parol) { toast("⚠️ Barcha maydonlarni to'ldiring", 'error'); return; }
+
+  bl(null, 'a-spinner', 'a-btn-txt', true, 'Yaratilmoqda…');
+  try {
+    const r = await req({ action: 'createAdmin', email: U.email, parol: U.parol, newIsm: ism, newEmail: email, newParol: parol });
+    if (r.ok) {
+      ['a-ism', 'a-email', 'a-parol'].forEach(id => g(id).value = '');
+      toast('✅ Admin yaratildi!', 'success');
+      loadAdmins();
+    } else toast('❌ ' + r.error, 'error');
+  } catch (e) { toast('❌ Xatolik', 'error'); }
+  bl(null, 'a-spinner', 'a-btn-txt', false, 'Yaratish');
+}
+
+async function delA(email, ism) {
+  if (!confirm(`"${ism}" o'chirilsinmi?`)) return;
+  try {
+    const r = await req({ action: 'deleteAdmin', email: U.email, parol: U.parol, deleteEmail: email });
+    if (r.ok) { toast("✅ Admin o'chirildi", 'success'); loadAdmins(); }
+    else toast('❌ ' + r.error, 'error');
+  } catch (e) {}
+}
+
+// ── Adminni tahrirlash (modal) ──
+let aeOld = null;
+
+function openAE(email, ism, parol) {
+  aeOld = email;
+  g('ae-ism').value   = ism;
+  g('ae-email').value = email;
+  g('ae-parol').value = '';
+  g('ae-modal').style.display = 'flex';
+}
+
+function closeAE() {
+  g('ae-modal').style.display = 'none';
+  aeOld = null;
+}
+
+async function saveAE() {
+  const ism   = g('ae-ism').value.trim();
+  const email = g('ae-email').value.trim();
+  const parol = g('ae-parol').value.trim();
+  if (!ism || !email) { toast("⚠️ Ism va email majburiy", 'error'); return; }
+
+  bl('ae-save', 'ae-spinner', 'ae-btn-txt', true, 'Saqlanmoqda…');
+  try {
+    const r = await req({ action: 'editAdmin', email: U.email, parol: U.parol, oldEmail: aeOld, newIsm: ism, newEmail: email, newParol: parol });
+    if (r.ok) { closeAE(); loadAdmins(); toast('✅ Admin yangilandi!', 'success'); }
+    else toast('❌ ' + r.error, 'error');
+  } catch (e) { toast('❌ Xatolik', 'error'); }
+  bl('ae-save', 'ae-spinner', 'ae-btn-txt', false, 'Saqlash');
+}
+
+// ─────────────────────────────────────────────
+//  YORDAMCHI FUNKSIYALAR
+// ─────────────────────────────────────────────
+
+/** Google Apps Script ga so'rov yuboradi */
+async function req(body) {
+  const qs = Object.entries(body)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+  return (await fetch(`${API}?${qs}`)).json();
+}
+
+/** Yangi o'quvchi formini tozalaydi */
+function clearF() {
+  ['f-ism', 'f-familiya', 'f-maktab', 'f-tel', 'f-tel2', 'f-manzil', 'f-tug', 'f-kun', 'f-yil'].forEach(id => {
+    const e = g(id);
+    e.value = '';
+    e.classList && e.classList.remove('err');
+  });
+  g('f-oy').value = '';
+  g('f-sinf').value = '';
+}
+
+/** Tugmani loading holatiga o'tkazadi yoki qaytaradi */
+function bl(btnId, spId, txtId, loading, txt) {
+  if (btnId) g(btnId).disabled = loading;
+  g(spId).style.display = loading ? 'inline-block' : 'none';
+  g(txtId).textContent = txt;
+}
+
+/** Parol ko'rsatish/yashirish */
+function togglePw(id) {
+  const i  = document.getElementById(id);
+  const ic = document.getElementById('eye-' + id);
+  const h  = i.type === 'password';
+  i.type   = h ? 'text' : 'password';
+  ic.innerHTML = h
+    ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
+    : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+       <line x1="1" y1="1" x2="23" y2="23"/>`;
+}
+
+/** Maktab raqamini tekshiradi (1–99) */
+function valM(inp) {
+  let v = inp.value.replace(/\D/g, '');
+  if (v.length > 2) v = v.slice(0, 2);
+  inp.value = v;
+  const n = parseInt(v);
+  inp.classList.toggle('err', !!(v && (isNaN(n) || n < 1 || n > 99)));
+}
+
+/** Maktab qiymatini qaytaradi, noto'g'ri bo'lsa null */
+function getM(id) {
+  const v = document.getElementById(id).value.trim();
+  const n = parseInt(v);
+  return (!v || isNaN(n) || n < 1 || n > 99) ? null : String(n);
+}
+
+/** getElementById qisqartmasi */
+function g(id) { return document.getElementById(id); }
+
+/** HTML apostroflardan himoyalanadi */
+function esc(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+/** Sana formatlaydi (qo'shilgan sanasi) */
+function fDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  return isNaN(d) ? v : d.toLocaleDateString('uz-UZ');
+}
+
+/** Tug'ilgan sanani formatlaydi */
+function fTug(v) {
+  if (!v) return '—';
+  const s = String(v);
+  if (s.match(/^\d{4}-\d{2}-\d{2}/) || s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d)) return d.toLocaleDateString('uz-UZ');
+  }
+  return s.length >= 4 ? s.substring(0, 4) : s;
+}
+
+/** Toast xabar ko'rsatadi */
+let toastT;
+function toast(msg, type = '') {
+  const t = g('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
