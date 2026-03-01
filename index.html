@@ -98,6 +98,7 @@ tbody td{padding:12px 14px;font-size:13px;color:var(--text);}
 .admin-info{display:flex;flex-direction:column;gap:3px;}
 .admin-name{font-weight:600;font-size:14px;}
 .admin-email{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;}
+.admin-parol{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:6px;display:inline-block;margin-top:2px;}
 .btn-small{padding:5px 12px;font-size:12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;background:none;color:var(--danger);border-color:var(--danger);transition:all .15s;}
 .btn-small:hover{background:var(--danger);color:white;}
 
@@ -306,6 +307,43 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ADMIN EDIT MODAL -->
+<div class="modal-overlay" id="admin-edit-modal" style="display:none;" onclick="closeAdminEditIfOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">✏️ Adminni tahrirlash</div>
+    <div class="form-grid">
+      <div class="field-group">
+        <label class="field-label">Ism</label>
+        <input class="field-input" id="ae-ism" placeholder="Ali Valiyev">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" id="ae-email" placeholder="ali@innovateit.uz">
+      </div>
+      <div class="field-group" style="grid-column:1/-1">
+        <label class="field-label">Yangi parol</label>
+        <div class="password-wrapper">
+          <input class="field-input" type="password" id="ae-parol" placeholder="Yangi parol (bo'sh qoldirsa o'zgarmaydi)">
+          <button class="toggle-eye" type="button" onclick="togglePassword('ae-parol', this)" tabindex="-1">
+            <svg id="eye-icon-ae-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAdminEdit()">Bekor qilish</button>
+      <button class="btn-submit" id="admin-edit-save-btn" onclick="saveAdminEdit()">
+        <span class="spinner" id="admin-edit-spinner"></span>
+        <span id="admin-edit-btn-text">Saqlash</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -570,8 +608,12 @@ function renderAdmins(admins) {
       <div class="admin-info">
         <span class="admin-name">${a.ism}</span>
         <span class="admin-email">${a.email}</span>
+        <span class="admin-parol">🔑 ${a.parol || '—'}</span>
       </div>
-      <button class="btn-small" onclick="deleteAdmin('${a.email}', '${a.ism}')">O'chirish</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-action btn-edit" onclick="openAdminEdit('${a.email}', '${a.ism}', '${a.parol||''}')">✏️ Tahrir</button>
+        <button class="btn-small" onclick="deleteAdmin('${a.email}', '${a.ism}')">O'chirish</button>
+      </div>
     </div>`).join('');
 }
 
@@ -628,6 +670,64 @@ async function deleteAdmin(email, ism) {
       showToast('❌ ' + res.error, 'error');
     }
   } catch(e) {}
+}
+
+// ─── ADMIN EDIT ───
+let editAdminOldEmail = null;
+
+function openAdminEdit(email, ism, parol) {
+  editAdminOldEmail = email;
+  document.getElementById('ae-ism').value = ism;
+  document.getElementById('ae-email').value = email;
+  document.getElementById('ae-parol').value = '';
+  document.getElementById('admin-edit-modal').style.display = 'flex';
+}
+
+function closeAdminEdit() {
+  document.getElementById('admin-edit-modal').style.display = 'none';
+  editAdminOldEmail = null;
+}
+
+function closeAdminEditIfOverlay(e) {
+  if (e.target === document.getElementById('admin-edit-modal')) closeAdminEdit();
+}
+
+async function saveAdminEdit() {
+  const ism   = document.getElementById('ae-ism').value.trim();
+  const email = document.getElementById('ae-email').value.trim();
+  const parol = document.getElementById('ae-parol').value.trim();
+
+  if (!ism || !email) {
+    showToast("⚠️ Ism va email majburiy", 'error'); return;
+  }
+
+  document.getElementById('admin-edit-spinner').style.display = 'inline-block';
+  document.getElementById('admin-edit-btn-text').textContent = 'Saqlanmoqda…';
+  document.getElementById('admin-edit-save-btn').disabled = true;
+
+  try {
+    const res = await apiPost({
+      action: 'editAdmin',
+      email: currentUser.email,
+      parol: currentUser.parol,
+      oldEmail: editAdminOldEmail,
+      newIsm: ism, newEmail: email,
+      newParol: parol
+    });
+    if (res.ok) {
+      closeAdminEdit();
+      loadAdmins();
+      showToast('✅ Admin yangilandi!', 'success');
+    } else {
+      showToast('❌ ' + res.error, 'error');
+    }
+  } catch(e) {
+    showToast('❌ Xatolik yuz berdi', 'error');
+  }
+
+  document.getElementById('admin-edit-spinner').style.display = 'none';
+  document.getElementById('admin-edit-btn-text').textContent = 'Saqlash';
+  document.getElementById('admin-edit-save-btn').disabled = false;
 }
 
 // ─── TABLE ───
