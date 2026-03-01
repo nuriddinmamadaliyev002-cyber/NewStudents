@@ -207,7 +207,7 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
           </div>
           <div class="field-group">
             <label class="field-label">Tug'ilgan sana</label>
-            <input class="field-input" type="date" id="f-tug" value="2014-01-01">
+            <input class="field-input" type="date" id="f-tug">
           </div>
           <div class="field-group">
             <label class="field-label">Qo'shimcha telefon raqam</label>
@@ -366,7 +366,7 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       </div>
       <div class="field-group">
         <label class="field-label">Tug'ilgan sana</label>
-        <input class="field-input" type="date" id="e-tug" value="2014-01-01">
+        <input class="field-input" type="date" id="e-tug">
       </div>
       <div class="field-group">
         <label class="field-label">Qo'sh. telefon</label>
@@ -554,7 +554,15 @@ async function addStudent() {
   const ism      = document.getElementById('f-ism').value.trim();
   const familiya = document.getElementById('f-familiya').value.trim();
   const telefon  = document.getElementById('f-telefon').value.trim();
-  const tug      = document.getElementById('f-tug').value;
+  // Tug'ilgan sanani yig'ish
+  const kun = String(document.getElementById('f-kun').value || '').padStart(2,'0');
+  const oy  = document.getElementById('f-oy').value;
+  const yil = document.getElementById('f-yil').value;
+  if (yil && (yil < 2009 || yil > 2019)) {
+    showToast("⚠️ Yil 2009-2019 oralig'ida bo'lishi kerak", 'error'); return;
+  }
+  if (yil && oy && kun) document.getElementById('f-tug').value = yil+'-'+oy+'-'+kun;
+  const tug = document.getElementById('f-tug').value;
   const maktab   = document.getElementById('f-maktab').value.trim();
   const sinf     = document.getElementById('f-sinf').value;
 
@@ -803,9 +811,24 @@ function openEdit(rowIndex) {
   document.getElementById('e-ism').value = s.ism || '';
   document.getElementById('e-familiya').value = s.familiya || '';
   document.getElementById('e-telefon').value = s.telefon || '';
-  // tug formatini date inputga moslash
-  const tugVal = s.tug ? new Date(s.tug) : null;
-  document.getElementById('e-tug').value = tugVal && !isNaN(tugVal) ? tugVal.toISOString().split('T')[0] : (s.tug || '');
+  // tug formatini kun/oy/yil ga bo'lish
+  if (s.tug) {
+    const d = new Date(s.tug);
+    if (!isNaN(d)) {
+      document.getElementById('e-kun').value = d.getDate();
+      document.getElementById('e-oy').value  = String(d.getMonth()+1).padStart(2,'0');
+      document.getElementById('e-yil').value = d.getFullYear();
+      document.getElementById('e-tug').value = d.toISOString().split('T')[0];
+    } else {
+      document.getElementById('e-kun').value = '';
+      document.getElementById('e-oy').value  = '';
+      document.getElementById('e-yil').value = s.tug;
+    }
+  } else {
+    document.getElementById('e-kun').value = '';
+    document.getElementById('e-oy').value  = '';
+    document.getElementById('e-yil').value = '';
+  }
   document.getElementById('e-telefon2').value = s.telefon2 || '';
   document.getElementById('e-manzil').value = s.manzil || '';
   document.getElementById('e-maktab').value = s.maktab || '';
@@ -826,7 +849,15 @@ async function saveEdit() {
   const ism      = document.getElementById('e-ism').value.trim();
   const familiya = document.getElementById('e-familiya').value.trim();
   const telefon  = document.getElementById('e-telefon').value.trim();
-  const tug      = document.getElementById('e-tug').value;
+  // Tug'ilgan sanani yig'ish
+  const eKun = String(document.getElementById('e-kun').value || '').padStart(2,'0');
+  const eOy  = document.getElementById('e-oy').value;
+  const eYil = document.getElementById('e-yil').value;
+  if (eYil && (eYil < 2009 || eYil > 2019)) {
+    showToast("⚠️ Yil 2009-2019 oralig'ida bo'lishi kerak", 'error'); return;
+  }
+  if (eYil && eOy && eKun) document.getElementById('e-tug').value = eYil+'-'+eOy+'-'+eKun;
+  const tug = document.getElementById('e-tug').value;
   const telefon2 = document.getElementById('e-telefon2').value.trim();
   const manzil   = document.getElementById('e-manzil').value.trim();
   const maktab   = document.getElementById('e-maktab').value.trim();
@@ -897,9 +928,10 @@ async function apiPost(body) {
 }
 
 function clearForm() {
-  ['f-ism','f-familiya','f-telefon','f-telefon2','f-manzil','f-tug','f-maktab','f-sinf'].forEach(id=>{
+  ['f-ism','f-familiya','f-telefon','f-telefon2','f-manzil','f-tug','f-maktab','f-sinf','f-kun','f-yil'].forEach(id=>{
     document.getElementById(id).value='';
   });
+  document.getElementById('f-oy').value='';
 }
 
 function setLoading(s) {
