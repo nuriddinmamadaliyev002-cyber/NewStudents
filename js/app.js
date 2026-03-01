@@ -86,12 +86,14 @@ async function showApp() {
     g('tabs-row').style.display     = 'flex';
     g('admin-col').style.display    = '';
     g('admin-selector-wrap').style.display = 'flex';
-    // Super admin uchun Davomat tugmasini yashirish
+    // Super admin uchun: Davomat yashiriq, form yashiriq
     g('btn-davomat').style.display = 'none';
+    g('add-student-form').style.display = 'none';
     await loadAdmins();
     buildAdminSelector();
   } else {
     g('btn-davomat').style.display = '';
+    g('add-student-form').style.display = 'block';
   }
 
   await loadStudents();
@@ -121,13 +123,15 @@ async function onAdminSelect() {
 
   if (!val) {
     viewingAdmin = null;
-    // Hech qaysi maktab tanlanmagan — Davomat yashiriq
+    // Hech qaysi maktab tanlanmagan — Davomat va form yashiriq
     g('btn-davomat').style.display = 'none';
+    g('add-student-form').style.display = 'none';
   } else {
     const found = ADMINS.find(a => a.username === val);
     viewingAdmin = found ? { username: found.username, ism: found.ism, parol: found.parol } : null;
-    // Maktab tanlangan — Davomat ko'rinadi
+    // Maktab tanlangan — Davomat va form ko'rinadi
     g('btn-davomat').style.display = '';
+    g('add-student-form').style.display = 'block';
   }
 
   // O'quvchilar ro'yxatini qayta yuklash
@@ -184,9 +188,12 @@ async function addStudent() {
   if (!tug)         { toast("⚠️ Tug'ilgan sana kiriting", 'error'); return; }
 
   bl('submit-btn', 'spinner', 'btn-txt', true, 'Saqlanmoqda…');
+  // Super admin tanlangan maktab admini nomidan qo'shadi
+  const actingUser  = (U.isSuper && viewingAdmin) ? viewingAdmin.username : U.username;
+  const actingParol = (U.isSuper && viewingAdmin) ? viewingAdmin.parol    : U.parol;
   try {
     const r = await req({
-      action: 'addStudent', username: U.username, parol: U.parol,
+      action: 'addStudent', username: actingUser, parol: actingParol,
       ism, familiya: fam, maktab, sinf,
       telefon: tel, telefon2: tel2, manzil, tug,
       date: new Date().toLocaleDateString('uz-UZ')
