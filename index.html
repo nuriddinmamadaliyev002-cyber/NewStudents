@@ -26,6 +26,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .field-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);transition:border-color .15s,box-shadow .15s;outline:none;}
 .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:#fff;}
 .field-group{margin-bottom:18px;}
+
+/* PASSWORD WRAPPER */
+.password-wrapper{position:relative;display:flex;align-items:center;}
+.password-wrapper .field-input{padding-right:42px;}
+.toggle-eye{position:absolute;right:12px;background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s;border-radius:6px;}
+.toggle-eye:hover{color:var(--text);}
+.toggle-eye svg{width:18px;height:18px;pointer-events:none;}
+
 .btn-primary{width:100%;padding:11px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:4px;}
 .btn-primary:hover{opacity:.85}.btn-primary:active{transform:scale(.98)}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
@@ -131,7 +139,17 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
     </div>
     <div class="field-group">
       <label class="field-label">Parol</label>
-      <input class="field-input" type="password" id="inp-parol" placeholder="••••••••">
+      <div class="password-wrapper">
+        <input class="field-input" type="password" id="inp-parol" placeholder="••••••••">
+        <button class="toggle-eye" type="button" onclick="togglePassword('inp-parol', this)" tabindex="-1" aria-label="Parolni ko'rsat/yashir">
+          <!-- Ko'z YOPIQ (default) -->
+          <svg id="eye-icon-inp-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+      </div>
     </div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Kirish</button>
     <p class="error-msg" id="login-error">❌ Login yoki parol noto'g'ri</p>
@@ -243,7 +261,16 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
           </div>
           <div class="field-group" style="margin:0">
             <label class="field-label">Parol</label>
-            <input class="field-input" id="a-parol" placeholder="Parol123!">
+            <div class="password-wrapper">
+              <input class="field-input" id="a-parol" type="password" placeholder="Parol123!">
+              <button class="toggle-eye" type="button" onclick="togglePassword('a-parol', this)" tabindex="-1" aria-label="Parolni ko'rsat/yashir">
+                <svg id="eye-icon-a-parol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
           </div>
           <button class="btn-submit" onclick="createAdmin()" style="margin:0;white-space:nowrap;">
             <span class="spinner" id="aspinner"></span>
@@ -267,10 +294,33 @@ select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztYQqbxem1Y2yO_Ec4_C0eOIAN0mn49zCVKorkVh_IXRe3JRmyp8kjtPcrOUQg_QLVUw/exec";
+// ⚠️ Shu yerga o'zingizning Apps Script URL ni qo'ying:
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuWx60-2AWTo4FETnZMU8n25IJJlY_T7Mvu1leWaFEP9aWX4rvg_CHYimCygzK2lUsXw/exec";
 
-let currentUser = null; // { email, parol, ism, isSuper }
+let currentUser = null;
 let students = [];
+
+// ─── SHOW / HIDE PASSWORD ───
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById('eye-icon-' + inputId);
+  const isHidden = input.type === 'password';
+
+  input.type = isHidden ? 'text' : 'password';
+
+  // Ko'z OCHIQ SVG
+  const eyeOpen = `
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>`;
+
+  // Ko'z YOPIQ (chiziq bilan) SVG
+  const eyeClosed = `
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>`;
+
+  icon.innerHTML = isHidden ? eyeOpen : eyeClosed;
+}
 
 // ─── LOGIN ───
 document.getElementById('inp-parol').addEventListener('keydown', e => {
@@ -312,6 +362,16 @@ function doLogout() {
   document.getElementById('inp-email').value = '';
   document.getElementById('inp-parol').value = '';
   document.getElementById('login-error').style.display = 'none';
+  // Parolni yana yashir
+  const inp = document.getElementById('inp-parol');
+  if (inp.type === 'text') {
+    inp.type = 'password';
+    const icon = document.getElementById('eye-icon-inp-parol');
+    icon.innerHTML = `
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>`;
+  }
 }
 
 // ─── SHOW APP ───
