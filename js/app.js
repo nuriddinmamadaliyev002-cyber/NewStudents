@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════
-//  InnovateIT School — Frontend JS  (v2.0)
+//  InnovateIT School — Frontend JS  (v2.1)
 //  username tizimi + super admin ko'rinishi
+//  FIX: oddiy admin openTeachers da to'g'ri huquq
 // ═══════════════════════════════════════════════════
 
 const API = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8qFV81dHH1QPMkFezQENr6S33bn07dLpK_l7fOw1pmHg/exec";
@@ -95,7 +96,9 @@ async function showApp() {
     await loadAdmins();
     buildAdminSelector();
   } else {
-    g('btn-davomat').style.display = '';
+    // Oddiy admin: davomat, o'qituvchilar va form — hammasi ko'rinadi
+    g('btn-davomat').style.display  = '';
+    g('btn-teachers').style.display = '';
     g('add-student-form').style.display = 'block';
   }
 
@@ -149,8 +152,6 @@ async function onAdminSelect() {
 async function loadStudents() {
   g('loading-ov').style.display = 'flex';
   try {
-    // Super admin boshqa adminni ko'rayotganda getStudents orqali emas,
-    // balki barcha o'quvchilardan filter qilib ko'rsatamiz
     const d = await req({ action: 'getStudents', username: U.username, parol: U.parol });
     if (d.ok) {
       let students = d.students;
@@ -411,7 +412,7 @@ async function createAdmin() {
       ['a-ism', 'a-username', 'a-parol'].forEach(id => g(id).value = '');
       toast('✅ Admin yaratildi!', 'success');
       await loadAdmins();
-      buildAdminSelector(); // Dropdown ni yangilash
+      buildAdminSelector();
     } else toast('❌ ' + r.error, 'error');
   } catch (e) { toast('❌ Xatolik', 'error'); }
   bl(null, 'a-spinner', 'a-btn-txt', false, 'Yaratish');
@@ -463,13 +464,23 @@ async function saveAE() {
 }
 
 // ─────────────────────────────────────────────
-//  DAVOMAT SAHIFASIGA O'TISH
+//  O'QITUVCHILAR SAHIFASIGA O'TISH
 // ─────────────────────────────────────────────
 function openTeachers() {
   let teacherUser;
 
-  if (viewingAdmin) {
-    // Biror maktab admin tanlangan → shu admin nomidan (proxy rejim, tahrirlash mumkin)
+  if (!U.isSuper) {
+    // ✅ ODDIY ADMIN — to'liq huquq (qo'shish, tahrirlash, o'chirish, davomat)
+    teacherUser = {
+      username:     U.username,
+      parol:        U.parol,
+      ism:          U.ism,
+      isSuper:      false,
+      isSuperProxy: false
+    };
+
+  } else if (viewingAdmin) {
+    // ✅ SUPER ADMIN + biror maktab tanlangan → proxy rejim (to'liq huquq)
     teacherUser = {
       username:      viewingAdmin.username,
       parol:         viewingAdmin.parol,
@@ -480,14 +491,14 @@ function openTeachers() {
       superParol:    U.parol,
       superIsm:      U.ism
     };
+
   } else {
-    // Hech kim tanlanmagan → super admin umumiy ko'rish rejimi (faqat o'qish)
+    // ✅ SUPER ADMIN + maktab tanlanmagan → faqat o'qish rejimi
     teacherUser = {
-      username: U.username,
-      parol:    U.parol,
-      ism:      U.ism,
-      isSuper:  true,
-      // Maktab nomlari xaritalash uchun
+      username:  U.username,
+      parol:     U.parol,
+      ism:       U.ism,
+      isSuper:   true,
       adminsMap: JSON.stringify(ADMINS.map(a => ({ username: a.username, ism: a.ism })))
     };
   }
@@ -503,17 +514,14 @@ function openDavomat() {
     return;
   }
 
-  // Davomat sahifasi uchun foydalanuvchi ma'lumotlari
   // Super admin tanlagan maktab admini nomidan davomatga kiradi
   const isProxy = U.isSuper && viewingAdmin;
   const davomatUser = {
-    // Agar super admin maktab tanlagan bo'lsa, shu maktab admini credentials bilan ishlaydi
-    username: isProxy ? viewingAdmin.username : U.username,
-    parol:    isProxy ? viewingAdmin.parol    : U.parol,
-    ism:      isProxy ? viewingAdmin.ism      : U.ism,
-    isSuper:  false, // davomat sahifasida proxy sifatida oddiy admin kabi ishlaydi
-    // Original super admin ma'lumotlarini saqlash (orqaga qaytish uchun)
-    isSuperProxy: isProxy,
+    username:      isProxy ? viewingAdmin.username : U.username,
+    parol:         isProxy ? viewingAdmin.parol    : U.parol,
+    ism:           isProxy ? viewingAdmin.ism      : U.ism,
+    isSuper:       false,
+    isSuperProxy:  isProxy,
     superUsername: U.username,
     superParol:    U.parol,
     superIsm:      U.ism
