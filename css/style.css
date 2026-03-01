@@ -197,6 +197,14 @@ body {
 @media (max-width: 520px) { .admin-selector { max-width: 110px; font-size: 11px; } }
 
 /* ── Davomat tugmasi ── */
+.btn-teachers {
+  background: #7c3aed; color: #fff;
+  border: none; border-radius: 8px; padding: 7px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-teachers:active { opacity: .8; }
 .btn-davomat {
   font-size: 12px; font-weight: 500;
   color: #fff; background: var(--accent);
