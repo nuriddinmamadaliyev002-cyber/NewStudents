@@ -1,179 +1,11 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>InnovateIT School — Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;
-  --muted:#7a7870;--accent:#2563eb;--accent-soft:#eff4ff;
-  --danger:#dc2626;--success:#16a34a;--radius:10px;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
-  --p:14px;
-}
-@media(min-width:600px){:root{--p:24px;}}
-@media(min-width:1024px){:root{--p:32px;}}
-html{-webkit-text-size-adjust:100%;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
-
-/* ══ LOGIN ══ */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 18px;width:100%;max-width:420px;box-shadow:var(--shadow);animation:fadeUp .4s ease;}
-@media(min-width:480px){.login-card{padding:44px 36px;}}
-.login-logo{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;display:flex;align-items:center;gap:8px;}
-.login-logo::before{content:'';width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;}
-.login-title{font-size:22px;font-weight:600;margin-bottom:6px;}
-@media(min-width:480px){.login-title{font-size:26px;}}
-.login-sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
-.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
-.field-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:16px;background:var(--bg);color:var(--text);transition:border-color .15s,box-shadow .15s;outline:none;-webkit-appearance:none;appearance:none;}
-.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:#fff;}
-.field-input.err{border-color:var(--danger);}
-.field-group{margin-bottom:14px;}
-.field-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4;}
-.pw-wrap{position:relative;}
-.pw-wrap .field-input{padding-right:48px;}
-.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px;color:var(--muted);border-radius:6px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
-.eye-btn svg{width:18px;height:18px;pointer-events:none;}
-.btn-primary{width:100%;padding:13px;background:var(--text);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s;margin-top:6px;-webkit-tap-highlight-color:transparent;}
-.btn-primary:active{opacity:.8;}
-.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
-.err-msg{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;display:none;}
-
-/* ══ APP SHELL ══ */
-#app{display:none;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 var(--p);height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;gap:8px;}
-.topbar-brand{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;}
-.topbar-brand::before{content:'';width:7px;height:7px;background:var(--accent);border-radius:50%;}
-.topbar-right{display:flex;align-items:center;gap:6px;overflow:hidden;min-width:0;}
-.admin-badge{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:3px 10px;border-radius:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;flex-shrink:1;}
-@media(max-width:380px){.admin-badge{display:none;}}
-.admin-badge.super{background:#fef3c7;border-color:#fbbf24;color:#92400e;}
-.stat-badge{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;}
-@media(max-width:340px){.stat-badge{display:none;}}
-.btn-logout{font-size:12px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
-.btn-logout:active{color:var(--danger);border-color:var(--danger);}
-.tabs{display:flex;gap:4px;padding:14px var(--p) 0;max-width:1200px;margin:0 auto;}
-.tab-btn{padding:8px 14px;border:1.5px solid var(--border);background:var(--surface);border-radius:8px 8px 0 0;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
-.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.main{max-width:1200px;margin:0 auto;padding:0 var(--p) 48px;}
-
-/* ══ CARDS ══ */
-.form-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow);}
-@media(min-width:600px){.form-card{padding:24px;margin-bottom:20px;}}
-.table-card{background:var(--surface);border:1px solid var(--border);border-radius:0 14px 14px 14px;box-shadow:var(--shadow);overflow:hidden;}
-.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:0 14px 14px 14px;padding:16px;box-shadow:var(--shadow);}
-@media(min-width:600px){.admin-card{padding:24px;}}
-.card-title{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-@media(min-width:600px){.card-title{font-size:15px;margin-bottom:18px;}}
-
-/* ══ FORM ══ */
-.form-grid{display:grid;grid-template-columns:1fr;gap:10px;}
-@media(min-width:500px){.form-grid{grid-template-columns:1fr 1fr;gap:12px;}}
-@media(min-width:900px){.form-grid{grid-template-columns:1fr 1fr 1fr;gap:14px;}}
-.dob-row{display:grid;grid-template-columns:68px 1fr 86px;gap:6px;}
-@media(min-width:480px){.dob-row{grid-template-columns:80px 1fr 100px;}}
-input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-input[type=number]{-moz-appearance:textfield;}
-select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7870' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
-
-.btn-submit{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;margin-top:6px;-webkit-tap-highlight-color:transparent;}
-@media(max-width:480px){.btn-submit{width:100%;padding:13px;font-size:15px;}}
-.btn-submit:active{background:#1d4ed8;}
-.btn-submit:disabled{opacity:.6;cursor:not-allowed;}
-.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
-
-/* ══ TABLE HEADER ══ */
-.table-header{padding:12px var(--p);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
-@media(min-width:640px){.table-header{flex-direction:row;align-items:center;justify-content:space-between;padding:16px 24px;}}
-.table-title{font-size:14px;font-weight:600;}
-.filters{display:flex;gap:8px;flex-wrap:wrap;}
-.search-input{flex:1;min-width:120px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;}
-.search-input:focus{border-color:var(--accent);background:#fff;}
-.filter-sel{flex:none;width:calc(50% - 4px);padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7870' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
-@media(min-width:640px){.filter-sel{width:130px;}}
-.filter-sel:focus{border-color:var(--accent);background-color:#fff;}
-
-/* ══ DESKTOP TABLE ══ */
-.tbl-wrap{overflow-x:auto;display:none;}
-@media(min-width:768px){.tbl-wrap{display:block;}}
-table{width:100%;border-collapse:collapse;min-width:700px;}
-thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
-tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:var(--bg);}
-tbody td{padding:10px 14px;font-size:13px;}
-.mono{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
-.sinf-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-soft);color:var(--accent);}
-.maktab-badge{display:inline-block;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
-
-/* ══ MOBILE CARDS ══ */
-.mobile-list{display:flex;flex-direction:column;gap:10px;padding:12px;}
-@media(min-width:768px){.mobile-list{display:none;}}
-.sc{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;}
-.sc-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;}
-.sc-name{font-weight:600;font-size:15px;line-height:1.3;}
-.sc-num{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;}
-.sc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
-.sc-btns{display:flex;gap:6px;flex-shrink:0;}
-.sc-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:10px;border-top:1px solid var(--border);}
-.sc-row{display:flex;flex-direction:column;gap:2px;}
-.sc-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
-.sc-val{font-size:13px;word-break:break-all;line-height:1.3;}
-.sc-val.m{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
-.sc-full{grid-column:1/-1;}
-.btn-action{padding:6px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;background:var(--surface);-webkit-tap-highlight-color:transparent;}
-.btn-action:active{opacity:.6;}
-
-/* ══ EMPTY ══ */
-.empty-state{text-align:center;padding:48px 24px;color:var(--muted);}
-.empty-state-icon{font-size:36px;margin-bottom:12px;}
-
-/* ══ ADMIN LIST ══ */
-.admin-list{display:flex;flex-direction:column;gap:10px;}
-.admin-item{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);gap:10px;}
-.admin-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
-.admin-name{font-weight:600;font-size:14px;}
-.admin-email{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;word-break:break-all;}
-.admin-ptag{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;background:var(--surface);border:1px solid var(--border);padding:2px 8px;border-radius:6px;display:inline-block;margin-top:2px;}
-.admin-acts{display:flex;gap:6px;flex-shrink:0;}
-.btn-small{padding:5px 10px;font-size:12px;border:1px solid var(--danger);border-radius:6px;cursor:pointer;background:none;color:var(--danger);-webkit-tap-highlight-color:transparent;}
-.btn-small:active{background:var(--danger);color:#fff;}
-.create-grid{display:grid;grid-template-columns:1fr;gap:10px;}
-@media(min-width:500px){.create-grid{grid-template-columns:1fr 1fr;}}
-@media(min-width:900px){.create-grid{grid-template-columns:1fr 1fr 1fr auto;align-items:end;}}
-.divider{height:1px;background:var(--border);margin:18px 0;}
-
-/* ══ TOAST ══ */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-.toast.success{background:var(--success);}
-.toast.error{background:var(--danger);}
-
-/* ══ LOADING ══ */
-.loading-overlay{position:fixed;inset:0;background:rgba(245,244,240,.85);display:none;align-items:center;justify-content:center;z-index:300;}
-.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
-
-/* ══ MODAL ══ */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:400;}
-@media(min-width:640px){.modal-overlay{align-items:center;}}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 -4px 40px rgba(0,0,0,.15);animation:slideUp .3s ease;}
-@media(min-width:640px){.modal{border-radius:16px;padding:28px;max-width:520px;animation:fadeUp .25s ease;}}
-.modal-drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
-@media(min-width:640px){.modal-drag{display:none;}}
-.modal-title{font-size:15px;font-weight:600;margin-bottom:16px;}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
-@media(max-width:400px){.modal-footer{flex-direction:column-reverse;}}
-.btn-cancel{padding:10px 18px;border:1.5px solid var(--border);background:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;}
-@media(max-width:400px){.btn-cancel,.modal-footer .btn-submit{width:100%;}}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>InnovateIT School — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -183,14 +15,18 @@ tbody td{padding:10px 14px;font-size:13px;}
     <div class="login-logo">InnovateIT School</div>
     <h1 class="login-title">Admin Panel</h1>
     <p class="login-sub">Davom etish uchun ma'lumotlarni kiriting</p>
+
     <div class="field-group">
       <label class="field-label">Email</label>
-      <input class="field-input" type="email" id="inp-email" placeholder="admin@innovateit.uz" autocomplete="email">
+      <input class="field-input" type="email" id="inp-email"
+        placeholder="admin@innovateit.uz" autocomplete="email">
     </div>
+
     <div class="field-group">
       <label class="field-label">Parol</label>
       <div class="pw-wrap">
-        <input class="field-input" type="password" id="inp-parol" placeholder="••••••••" autocomplete="current-password">
+        <input class="field-input" type="password" id="inp-parol"
+          placeholder="••••••••" autocomplete="current-password">
         <button class="eye-btn" onclick="togglePw('inp-parol')" tabindex="-1" type="button">
           <svg id="eye-inp-parol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
@@ -200,6 +36,7 @@ tbody td{padding:10px 14px;font-size:13px;}
         </button>
       </div>
     </div>
+
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Kirish</button>
     <p class="err-msg" id="login-err"></p>
   </div>
@@ -207,35 +44,43 @@ tbody td{padding:10px 14px;font-size:13px;}
 
 <!-- ════════════════ APP ════════════════ -->
 <div id="app">
+
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-brand">InnovateIT</div>
     <div class="topbar-right">
       <span class="admin-badge" id="admin-badge"></span>
-      <span class="stat-badge" id="total-count">0</span>
+      <span class="stat-badge"  id="total-count">0</span>
       <button class="btn-logout" onclick="doLogout()">Chiqish</button>
     </div>
   </div>
 
+  <!-- Tablar (faqat super admin ko'radi) -->
   <div class="tabs" id="tabs-row" style="display:none;">
     <button class="tab-btn active" onclick="switchTab('s')">📋 O'quvchilar</button>
-    <button class="tab-btn" onclick="switchTab('a')">👥 Adminlar</button>
+    <button class="tab-btn"        onclick="switchTab('a')">👥 Adminlar</button>
   </div>
 
   <div class="main">
 
-    <!-- ─────────── O'QUVCHILAR ─────────── -->
+    <!-- ─────────── O'QUVCHILAR TABI ─────────── -->
     <div id="tab-s">
+
+      <!-- Qo'shish formasi -->
       <div class="form-card" style="margin-top:14px;">
         <div class="card-title">➕ Yangi o'quvchi qo'shish</div>
         <div class="form-grid">
+
           <div class="field-group">
             <label class="field-label">Ism</label>
             <input class="field-input" id="f-ism" placeholder="Sardor" autocomplete="off">
           </div>
+
           <div class="field-group">
             <label class="field-label">Familiya</label>
             <input class="field-input" id="f-familiya" placeholder="Karimov" autocomplete="off">
           </div>
+
           <div class="field-group">
             <label class="field-label">Maktab raqami</label>
             <input class="field-input" id="f-maktab" type="number" inputmode="numeric"
@@ -243,6 +88,7 @@ tbody td{padding:10px 14px;font-size:13px;}
               style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;text-align:center;letter-spacing:3px;padding:10px;">
             <p class="field-hint">Faqat 1–99 oralig'idagi raqam</p>
           </div>
+
           <div class="field-group">
             <label class="field-label">Sinfi</label>
             <select class="field-input" id="f-sinf">
@@ -252,35 +98,44 @@ tbody td{padding:10px 14px;font-size:13px;}
               <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
             </select>
           </div>
+
           <div class="field-group">
             <label class="field-label">Telefon</label>
             <input class="field-input" type="tel" id="f-tel" inputmode="tel" placeholder="+998 90 123 45 67">
           </div>
+
           <div class="field-group">
             <label class="field-label">Qo'shimcha telefon</label>
             <input class="field-input" type="tel" id="f-tel2" inputmode="tel" placeholder="+998 90 123 45 67">
           </div>
+
           <div class="field-group">
             <label class="field-label">Tug'ilgan sana</label>
             <div class="dob-row">
-              <input class="field-input" id="f-kun" type="number" inputmode="numeric" placeholder="Kun" min="1" max="31" style="text-align:center;padding-left:4px;padding-right:4px;">
+              <input class="field-input" id="f-kun" type="number" inputmode="numeric"
+                placeholder="Kun" min="1" max="31"
+                style="text-align:center;padding-left:4px;padding-right:4px;">
               <select class="field-input" id="f-oy">
                 <option value="">Oy</option>
-                <option value="01">Yanvar</option><option value="02">Fevral</option>
-                <option value="03">Mart</option><option value="04">Aprel</option>
-                <option value="05">May</option><option value="06">Iyun</option>
-                <option value="07">Iyul</option><option value="08">Avgust</option>
-                <option value="09">Sentabr</option><option value="10">Oktabr</option>
-                <option value="11">Noyabr</option><option value="12">Dekabr</option>
+                <option value="01">Yanvar</option>  <option value="02">Fevral</option>
+                <option value="03">Mart</option>    <option value="04">Aprel</option>
+                <option value="05">May</option>     <option value="06">Iyun</option>
+                <option value="07">Iyul</option>    <option value="08">Avgust</option>
+                <option value="09">Sentabr</option> <option value="10">Oktabr</option>
+                <option value="11">Noyabr</option>  <option value="12">Dekabr</option>
               </select>
-              <input class="field-input" id="f-yil" type="number" inputmode="numeric" placeholder="Yil" min="2009" max="2019" style="text-align:center;padding-left:4px;padding-right:4px;">
+              <input class="field-input" id="f-yil" type="number" inputmode="numeric"
+                placeholder="Yil" min="2009" max="2019"
+                style="text-align:center;padding-left:4px;padding-right:4px;">
             </div>
             <input type="hidden" id="f-tug">
           </div>
+
           <div class="field-group">
             <label class="field-label">Yashash manzili</label>
             <input class="field-input" id="f-manzil" placeholder="Toshkent, Chilonzor">
           </div>
+
         </div>
         <button class="btn-submit" id="submit-btn" onclick="addStudent()">
           <span class="spinner" id="spinner"></span>
@@ -288,12 +143,13 @@ tbody td{padding:10px 14px;font-size:13px;}
         </button>
       </div>
 
-      <!-- JADVAL -->
+      <!-- O'quvchilar jadvali -->
       <div class="table-card">
         <div class="table-header">
           <div class="table-title">O'quvchilar ro'yxati</div>
           <div class="filters">
-            <input class="search-input" id="f-search" placeholder="🔍  Ism, telefon…" oninput="applyFilters()">
+            <input class="search-input" id="f-search"
+              placeholder="🔍  Ism, telefon…" oninput="applyFilters()">
             <select class="filter-sel" id="f-maktab-f" onchange="applyFilters()">
               <option value="">Barcha maktab</option>
             </select>
@@ -306,27 +162,37 @@ tbody td{padding:10px 14px;font-size:13px;}
           </div>
         </div>
 
-        <!-- DESKTOP TABLE -->
+        <!-- Desktop jadval -->
         <div class="tbl-wrap">
           <table>
             <thead><tr>
-              <th>#</th><th>Ism Familiya</th><th>Maktab</th><th>Sinf</th>
-              <th>Telefon</th><th>Qo'sh. tel</th><th>Tug'ilgan</th><th>Manzil</th>
+              <th>#</th>
+              <th>Ism Familiya</th>
+              <th>Maktab</th>
+              <th>Sinf</th>
+              <th>Telefon</th>
+              <th>Qo'sh. tel</th>
+              <th>Tug'ilgan</th>
+              <th>Manzil</th>
               <th id="admin-col" style="display:none;">Admin</th>
-              <th>Sana</th><th>Amal</th>
+              <th>Sana</th>
+              <th>Amal</th>
             </tr></thead>
             <tbody id="tbl-body"></tbody>
           </table>
         </div>
 
-        <!-- MOBILE CARDS -->
+        <!-- Mobil kartalar -->
         <div id="mob-cards" class="mobile-list"></div>
       </div>
-    </div>
 
-    <!-- ─────────── ADMINLAR ─────────── -->
+    </div><!-- /tab-s -->
+
+    <!-- ─────────── ADMINLAR TABI ─────────── -->
     <div id="tab-a" style="display:none;">
       <div class="admin-card" style="margin-top:14px;">
+
+        <!-- Yangi admin yaratish -->
         <div class="card-title">➕ Yangi admin yaratish</div>
         <div class="create-grid">
           <div class="field-group" style="margin:0">
@@ -357,25 +223,35 @@ tbody td{padding:10px 14px;font-size:13px;}
             </button>
           </div>
         </div>
+
         <div class="divider"></div>
+
+        <!-- Adminlar ro'yxati -->
         <div class="card-title">👥 Adminlar ro'yxati</div>
         <div class="admin-list" id="admin-list">
           <div class="empty-state"><div class="empty-state-icon">👤</div><p>Adminlar yo'q</p></div>
         </div>
+
       </div>
-    </div>
+    </div><!-- /tab-a -->
 
-  </div>
-</div>
+  </div><!-- /main -->
+</div><!-- /app -->
 
-<!-- ADMIN EDIT MODAL -->
+<!-- ════════ MODAL: Adminni tahrirlash ════════ -->
 <div class="modal-overlay" id="ae-modal" onclick="if(event.target===this)closeAE()">
   <div class="modal">
     <div class="modal-drag"></div>
     <div class="modal-title">✏️ Adminni tahrirlash</div>
     <div class="form-grid">
-      <div class="field-group"><label class="field-label">Ism</label><input class="field-input" id="ae-ism"></div>
-      <div class="field-group"><label class="field-label">Email</label><input class="field-input" type="email" id="ae-email"></div>
+      <div class="field-group">
+        <label class="field-label">Ism</label>
+        <input class="field-input" id="ae-ism">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" id="ae-email">
+      </div>
       <div class="field-group" style="grid-column:1/-1">
         <label class="field-label">Yangi parol</label>
         <div class="pw-wrap">
@@ -393,26 +269,37 @@ tbody td{padding:10px 14px;font-size:13px;}
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeAE()">Bekor qilish</button>
       <button class="btn-submit" id="ae-save" onclick="saveAE()">
-        <span class="spinner" id="ae-spinner"></span><span id="ae-btn-txt">Saqlash</span>
+        <span class="spinner" id="ae-spinner"></span>
+        <span id="ae-btn-txt">Saqlash</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- EDIT STUDENT MODAL -->
+<!-- ════════ MODAL: O'quvchini tahrirlash ════════ -->
 <div class="modal-overlay" id="es-modal" onclick="if(event.target===this)closeES()">
   <div class="modal">
     <div class="modal-drag"></div>
     <div class="modal-title">✏️ O'quvchini tahrirlash</div>
     <div class="form-grid">
-      <div class="field-group"><label class="field-label">Ism</label><input class="field-input" id="e-ism"></div>
-      <div class="field-group"><label class="field-label">Familiya</label><input class="field-input" id="e-familiya"></div>
+
+      <div class="field-group">
+        <label class="field-label">Ism</label>
+        <input class="field-input" id="e-ism">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Familiya</label>
+        <input class="field-input" id="e-familiya">
+      </div>
+
       <div class="field-group">
         <label class="field-label">Maktab raqami</label>
-        <input class="field-input" id="e-maktab" type="number" inputmode="numeric" min="1" max="99"
-          oninput="valM(this)" style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;text-align:center;letter-spacing:3px;padding:10px;">
+        <input class="field-input" id="e-maktab" type="number" inputmode="numeric"
+          min="1" max="99" oninput="valM(this)"
+          style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;text-align:center;letter-spacing:3px;padding:10px;">
         <p class="field-hint">1–99 oralig'idagi raqam</p>
       </div>
+
       <div class="field-group">
         <label class="field-label">Sinfi</label>
         <select class="field-input" id="e-sinf">
@@ -422,322 +309,60 @@ tbody td{padding:10px 14px;font-size:13px;}
           <option>7-sinf</option><option>8-sinf</option><option>9-sinf</option>
         </select>
       </div>
-      <div class="field-group"><label class="field-label">Telefon</label><input class="field-input" id="e-tel" type="tel" inputmode="tel"></div>
-      <div class="field-group"><label class="field-label">Qo'sh. telefon</label><input class="field-input" id="e-tel2" type="tel" inputmode="tel"></div>
+
+      <div class="field-group">
+        <label class="field-label">Telefon</label>
+        <input class="field-input" id="e-tel" type="tel" inputmode="tel">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Qo'sh. telefon</label>
+        <input class="field-input" id="e-tel2" type="tel" inputmode="tel">
+      </div>
+
       <div class="field-group">
         <label class="field-label">Tug'ilgan sana</label>
         <div class="dob-row">
-          <input class="field-input" id="e-kun" type="number" inputmode="numeric" placeholder="Kun" min="1" max="31" style="text-align:center;padding-left:4px;padding-right:4px;">
+          <input class="field-input" id="e-kun" type="number" inputmode="numeric"
+            placeholder="Kun" min="1" max="31"
+            style="text-align:center;padding-left:4px;padding-right:4px;">
           <select class="field-input" id="e-oy">
             <option value="">Oy</option>
-            <option value="01">Yanvar</option><option value="02">Fevral</option>
-            <option value="03">Mart</option><option value="04">Aprel</option>
-            <option value="05">May</option><option value="06">Iyun</option>
-            <option value="07">Iyul</option><option value="08">Avgust</option>
-            <option value="09">Sentabr</option><option value="10">Oktabr</option>
-            <option value="11">Noyabr</option><option value="12">Dekabr</option>
+            <option value="01">Yanvar</option>  <option value="02">Fevral</option>
+            <option value="03">Mart</option>    <option value="04">Aprel</option>
+            <option value="05">May</option>     <option value="06">Iyun</option>
+            <option value="07">Iyul</option>    <option value="08">Avgust</option>
+            <option value="09">Sentabr</option> <option value="10">Oktabr</option>
+            <option value="11">Noyabr</option>  <option value="12">Dekabr</option>
           </select>
-          <input class="field-input" id="e-yil" type="number" inputmode="numeric" placeholder="Yil" min="2009" max="2019" style="text-align:center;padding-left:4px;padding-right:4px;">
+          <input class="field-input" id="e-yil" type="number" inputmode="numeric"
+            placeholder="Yil" min="2009" max="2019"
+            style="text-align:center;padding-left:4px;padding-right:4px;">
         </div>
         <input type="hidden" id="e-tug">
       </div>
-      <div class="field-group"><label class="field-label">Yashash manzili</label><input class="field-input" id="e-manzil"></div>
+
+      <div class="field-group">
+        <label class="field-label">Yashash manzili</label>
+        <input class="field-input" id="e-manzil">
+      </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeES()">Bekor qilish</button>
       <button class="btn-submit" id="es-save" onclick="saveES()">
-        <span class="spinner" id="es-spinner"></span><span id="es-btn-txt">Saqlash</span>
+        <span class="spinner" id="es-spinner"></span>
+        <span id="es-btn-txt">Saqlash</span>
       </button>
     </div>
   </div>
 </div>
 
-<div class="loading-overlay" id="loading-ov"><div class="loading-spinner"></div></div>
+<!-- ════════ GLOBAL UI ELEMENTS ════════ -->
+<div class="loading-overlay" id="loading-ov">
+  <div class="loading-spinner"></div>
+</div>
 <div class="toast" id="toast"></div>
 
-<script>
-const API = "https://script.google.com/macros/s/AKfycbzPxt1L57qhkwgwHz8qDXgqRg8qFV81dHH1QPMkFezQENr6S33bn07dLpK_l7fOw1pmHg/exec";
-let U = null, S = [];
-
-window.addEventListener('DOMContentLoaded', async () => {
-  try { const s = localStorage.getItem('iit_u'); if(s){U=JSON.parse(s);await showApp();} } catch(e){localStorage.removeItem('iit_u');}
-});
-
-// ── MAKTAB VALIDATION ──
-function valM(inp) {
-  let v = inp.value.replace(/\D/g,'');
-  if(v.length>2) v=v.slice(0,2);
-  inp.value = v;
-  const n = parseInt(v);
-  inp.classList.toggle('err', !!(v && (isNaN(n)||n<1||n>99)));
-}
-function getM(id) {
-  const v = document.getElementById(id).value.trim();
-  const n = parseInt(v);
-  return (!v||isNaN(n)||n<1||n>99) ? null : String(n);
-}
-
-// ── PASSWORD ──
-function togglePw(id) {
-  const i=document.getElementById(id), ic=document.getElementById('eye-'+id);
-  const h=i.type==='password'; i.type=h?'text':'password';
-  ic.innerHTML=h
-    ?`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
-    :`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-      <line x1="1" y1="1" x2="23" y2="23"/>`;
-}
-
-// ── LOGIN ──
-document.getElementById('inp-parol').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-async function doLogin() {
-  const email=g('inp-email').value.trim(), parol=g('inp-parol').value;
-  if(!email||!parol) return;
-  const btn=g('login-btn'); btn.disabled=true; btn.textContent='Tekshirilmoqda…';
-  try {
-    const r=await req({action:'login',email,parol});
-    if(r.ok){U={email,parol,ism:r.ism,isSuper:r.isSuper};localStorage.setItem('iit_u',JSON.stringify(U));showApp();}
-    else{const el=g('login-err');el.textContent='❌ '+(r.error||"Noto'g'ri");el.style.display='block';}
-  } catch(e){const el=g('login-err');el.textContent='❌ Ulanishda xatolik';el.style.display='block';}
-  btn.disabled=false; btn.textContent='Kirish';
-}
-function doLogout(){
-  U=null;S=[];localStorage.removeItem('iit_u');
-  g('app').style.display='none';g('login-screen').style.display='flex';
-  g('inp-email').value='';g('inp-parol').value='';g('login-err').style.display='none';
-}
-
-// ── SHOW APP ──
-async function showApp(){
-  g('login-screen').style.display='none';g('app').style.display='block';
-  const b=g('admin-badge'); b.textContent=U.ism;
-  if(U.isSuper){b.classList.add('super');b.textContent='⭐ '+U.ism;g('tabs-row').style.display='flex';g('admin-col').style.display='';loadAdmins();}
-  await loadStudents();
-}
-
-function switchTab(t){
-  g('tab-s').style.display=t==='s'?'block':'none';
-  g('tab-a').style.display=t==='a'?'block':'none';
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='s')||(i===1&&t==='a')));
-}
-
-// ── STUDENTS ──
-async function loadStudents(){
-  g('loading-ov').style.display='flex';
-  try {
-    const d=await req({action:'getStudents',email:U.email,parol:U.parol});
-    if(d.ok){S=d.students;S.forEach((s,i)=>s.ri=i);updMaktabF();applyFilters();g('total-count').textContent=S.length+" o'quvchi";}
-  } catch(e){toast("❌ Ma'lumotlar yuklanmadi",'error');}
-  g('loading-ov').style.display='none';
-}
-
-async function addStudent(){
-  const ism=g('f-ism').value.trim(),fam=g('f-familiya').value.trim();
-  const maktab=getM('f-maktab'),sinf=g('f-sinf').value;
-  const tel=g('f-tel').value.trim(),tel2=g('f-tel2').value.trim(),manzil=g('f-manzil').value.trim();
-  const kun=String(g('f-kun').value||'').padStart(2,'0'),oy=g('f-oy').value,yil=g('f-yil').value;
-  if(yil&&(yil<2009||yil>2019)){toast("⚠️ Yil 2009–2019 bo'lishi kerak",'error');return;}
-  if(yil&&oy&&kun) g('f-tug').value=yil+'-'+oy+'-'+kun;
-  const tug=g('f-tug').value;
-  if(!ism||!fam){toast("⚠️ Ism va familiya kiriting",'error');return;}
-  if(!maktab){toast("⚠️ Maktab raqami 1–99",'error');g('f-maktab').classList.add('err');return;}
-  if(!sinf){toast("⚠️ Sinf tanlang",'error');return;}
-  if(!tel){toast("⚠️ Telefon kiriting",'error');return;}
-  if(!tug){toast("⚠️ Tug'ilgan sana kiriting",'error');return;}
-  bl('submit-btn','spinner','btn-txt',true,'Saqlanmoqda…');
-  try {
-    const r=await req({action:'addStudent',email:U.email,parol:U.parol,ism,familiya:fam,maktab,sinf,telefon:tel,telefon2:tel2,manzil,tug,date:new Date().toLocaleDateString('uz-UZ')});
-    if(r.ok){clearF();await loadStudents();toast("✅ O'quvchi qo'shildi!",'success');}
-    else toast('❌ '+r.error,'error');
-  } catch(e){toast('❌ Xatolik','error');}
-  bl('submit-btn','spinner','btn-txt',false,'Saqlash');
-}
-
-function applyFilters(){
-  const q=(g('f-search').value||'').toLowerCase();
-  const fm=g('f-maktab-f').value,fs=g('f-sinf-f').value;
-  const d=S.filter(s=>(!q||(s.ism+' '+s.familiya+' '+s.telefon).toLowerCase().includes(q))&&(!fm||String(s.maktab)===String(fm))&&(!fs||s.sinf===fs));
-  renderTbl(d);renderMob(d);
-}
-
-function renderTbl(d){
-  const tb=g('tbl-body'),sup=U&&U.isSuper;
-  if(!d.length){tb.innerHTML=`<tr><td colspan="${sup?11:10}"><div class="empty-state"><div class="empty-state-icon">📋</div><p>O'quvchi topilmadi</p></div></td></tr>`;return;}
-  tb.innerHTML=d.map((s,i)=>`<tr>
-    <td class="mono">${i+1}</td>
-    <td><strong>${s.ism}</strong> ${s.familiya}</td>
-    <td><span class="maktab-badge">${s.maktab||'—'}</span></td>
-    <td><span class="sinf-badge">${s.sinf||'—'}</span></td>
-    <td class="mono">${s.telefon||'—'}</td>
-    <td class="mono">${s.telefon2||'—'}</td>
-    <td class="mono">${fTug(s.tug)}</td>
-    <td>${s.manzil||'—'}</td>
-    ${sup?`<td class="mono" style="font-size:11px;">${s.admin||'—'}</td>`:''}
-    <td class="mono">${fDate(s.date)}</td>
-    <td><div style="display:flex;gap:6px;">
-      <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
-      <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism+' '+s.familiya)}')">🗑️</button>
-    </div></td>
-  </tr>`).join('');
-}
-
-function renderMob(d){
-  const el=g('mob-cards'),sup=U&&U.isSuper;
-  if(!d.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><p>O\'quvchi topilmadi</p></div>';return;}
-  el.innerHTML=d.map((s,i)=>`
-    <div class="sc">
-      <div class="sc-header">
-        <div>
-          <div class="sc-name">${s.ism} ${s.familiya}</div>
-          <div class="sc-num">#${i+1}</div>
-          <div class="sc-tags">
-            <span class="maktab-badge">${s.maktab||'—'}-maktab</span>
-            <span class="sinf-badge">${s.sinf||'—'}</span>
-          </div>
-        </div>
-        <div class="sc-btns">
-          <button class="btn-action" onclick="openES(${s.ri})">✏️</button>
-          <button class="btn-action" onclick="delS(${s.ri},'${esc(s.ism+' '+s.familiya)}')">🗑️</button>
-        </div>
-      </div>
-      <div class="sc-body">
-        <div class="sc-row"><span class="sc-lbl">📞 Telefon</span><span class="sc-val m">${s.telefon||'—'}</span></div>
-        <div class="sc-row"><span class="sc-lbl">📞 Qo'sh.</span><span class="sc-val m">${s.telefon2||'—'}</span></div>
-        <div class="sc-row"><span class="sc-lbl">🎂 Tug'ilgan</span><span class="sc-val m">${fTug(s.tug)}</span></div>
-        <div class="sc-row"><span class="sc-lbl">📍 Manzil</span><span class="sc-val">${s.manzil||'—'}</span></div>
-        ${sup?`<div class="sc-row sc-full"><span class="sc-lbl">👤 Admin</span><span class="sc-val m" style="font-size:11px;">${s.admin||'—'}</span></div>`:''}
-        <div class="sc-row"><span class="sc-lbl">📅 Sana</span><span class="sc-val m">${fDate(s.date)}</span></div>
-      </div>
-    </div>`).join('');
-}
-
-function updMaktabF(){
-  const sel=g('f-maktab-f'),cur=sel.value;
-  const list=[...new Set(S.map(s=>s.maktab).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
-  sel.innerHTML='<option value="">Barcha maktab</option>'+list.map(m=>`<option${String(m)===String(cur)?' selected':''}>${m}</option>`).join('');
-}
-
-// ── EDIT STUDENT ──
-let eIdx=null;
-function openES(idx){
-  const s=S[idx];if(!s)return;eIdx=idx;
-  g('e-ism').value=s.ism||'';g('e-familiya').value=s.familiya||'';
-  g('e-maktab').value=s.maktab||'';g('e-sinf').value=s.sinf||'';
-  g('e-tel').value=s.telefon||'';g('e-tel2').value=s.telefon2||'';g('e-manzil').value=s.manzil||'';
-  if(s.tug){const d=new Date(s.tug);if(!isNaN(d)){g('e-kun').value=d.getDate();g('e-oy').value=String(d.getMonth()+1).padStart(2,'0');g('e-yil').value=d.getFullYear();g('e-tug').value=d.toISOString().split('T')[0];}}
-  else {['e-kun','e-oy','e-yil','e-tug'].forEach(id=>g(id).value='');}
-  g('es-modal').style.display='flex';
-}
-function closeES(){g('es-modal').style.display='none';eIdx=null;}
-async function saveES(){
-  const ism=g('e-ism').value.trim(),fam=g('e-familiya').value.trim();
-  const maktab=getM('e-maktab'),sinf=g('e-sinf').value;
-  const tel=g('e-tel').value.trim(),tel2=g('e-tel2').value.trim(),manzil=g('e-manzil').value.trim();
-  const kun=String(g('e-kun').value||'').padStart(2,'0'),oy=g('e-oy').value,yil=g('e-yil').value;
-  if(yil&&(yil<2009||yil>2019)){toast("⚠️ Yil 2009–2019 bo'lishi kerak",'error');return;}
-  if(yil&&oy&&kun) g('e-tug').value=yil+'-'+oy+'-'+kun;
-  const tug=g('e-tug').value;
-  if(!ism||!fam){toast("⚠️ Ism va familiya kiriting",'error');return;}
-  if(!maktab){toast("⚠️ Maktab raqami 1–99",'error');return;}
-  if(!sinf){toast("⚠️ Sinf tanlang",'error');return;}
-  if(!tel){toast("⚠️ Telefon kiriting",'error');return;}
-  const s=S[eIdx];
-  bl('es-save','es-spinner','es-btn-txt',true,'Saqlanmoqda…');
-  try {
-    const r=await req({action:'editStudent',email:U.email,parol:U.parol,oldIsm:s.ism,oldFamiliya:s.familiya,ism,familiya:fam,maktab,sinf,telefon:tel,telefon2:tel2,manzil,tug});
-    if(r.ok){closeES();await loadStudents();toast("✅ O'quvchi yangilandi!",'success');}
-    else toast('❌ '+r.error,'error');
-  }catch(e){toast('❌ Xatolik','error');}
-  bl('es-save','es-spinner','es-btn-txt',false,'Saqlash');
-}
-
-async function delS(idx,name){
-  if(!confirm(`"${name}" o'chirilsinmi?`)) return;
-  const s=S[idx];
-  try {
-    const r=await req({action:'deleteStudent',email:U.email,parol:U.parol,delIsm:s.ism,delFamiliya:s.familiya});
-    if(r.ok){await loadStudents();toast("✅ O'quvchi o'chirildi",'success');}else toast('❌ '+r.error,'error');
-  }catch(e){}
-}
-
-// ── ADMINS ──
-async function loadAdmins(){
-  try{const d=await req({action:'getAdmins',email:U.email,parol:U.parol});if(d.ok)renderAdmins(d.admins);}catch(e){}
-}
-function renderAdmins(admins){
-  const el=g('admin-list');
-  if(!admins.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">👤</div><p>Admin yo\'q</p></div>';return;}
-  el.innerHTML=admins.map(a=>`
-    <div class="admin-item">
-      <div class="admin-info">
-        <span class="admin-name">${a.ism}</span>
-        <span class="admin-email">${a.email}</span>
-        <span class="admin-ptag">🔑 ${a.parol||'—'}</span>
-      </div>
-      <div class="admin-acts">
-        <button class="btn-action" onclick="openAE('${esc(a.email)}','${esc(a.ism)}','${esc(a.parol||'')}')">✏️</button>
-        <button class="btn-small" onclick="delA('${esc(a.email)}','${esc(a.ism)}')">O'chirish</button>
-      </div>
-    </div>`).join('');
-}
-async function createAdmin(){
-  const ism=g('a-ism').value.trim(),email=g('a-email').value.trim(),parol=g('a-parol').value.trim();
-  if(!ism||!email||!parol){toast("⚠️ Barcha maydonlarni to'ldiring",'error');return;}
-  bl(null,'a-spinner','a-btn-txt',true,'Yaratilmoqda…');
-  try{
-    const r=await req({action:'createAdmin',email:U.email,parol:U.parol,newIsm:ism,newEmail:email,newParol:parol});
-    if(r.ok){['a-ism','a-email','a-parol'].forEach(id=>g(id).value='');toast('✅ Admin yaratildi!','success');loadAdmins();}
-    else toast('❌ '+r.error,'error');
-  }catch(e){toast('❌ Xatolik','error');}
-  bl(null,'a-spinner','a-btn-txt',false,'Yaratish');
-}
-async function delA(email,ism){
-  if(!confirm(`"${ism}" o'chirilsinmi?`)) return;
-  try{const r=await req({action:'deleteAdmin',email:U.email,parol:U.parol,deleteEmail:email});if(r.ok){toast("✅ Admin o'chirildi",'success');loadAdmins();}else toast('❌ '+r.error,'error');}catch(e){}
-}
-
-let aeOld=null;
-function openAE(email,ism,parol){aeOld=email;g('ae-ism').value=ism;g('ae-email').value=email;g('ae-parol').value='';g('ae-modal').style.display='flex';}
-function closeAE(){g('ae-modal').style.display='none';aeOld=null;}
-async function saveAE(){
-  const ism=g('ae-ism').value.trim(),email=g('ae-email').value.trim(),parol=g('ae-parol').value.trim();
-  if(!ism||!email){toast("⚠️ Ism va email majburiy",'error');return;}
-  bl('ae-save','ae-spinner','ae-btn-txt',true,'Saqlanmoqda…');
-  try{
-    const r=await req({action:'editAdmin',email:U.email,parol:U.parol,oldEmail:aeOld,newIsm:ism,newEmail:email,newParol:parol});
-    if(r.ok){closeAE();loadAdmins();toast('✅ Admin yangilandi!','success');}else toast('❌ '+r.error,'error');
-  }catch(e){toast('❌ Xatolik','error');}
-  bl('ae-save','ae-spinner','ae-btn-txt',false,'Saqlash');
-}
-
-// ── HELPERS ──
-async function req(body){
-  const qs=Object.entries(body).map(([k,v])=>`${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
-  return (await fetch(`${API}?${qs}`)).json();
-}
-function clearF(){
-  ['f-ism','f-familiya','f-maktab','f-tel','f-tel2','f-manzil','f-tug','f-kun','f-yil'].forEach(id=>{const e=g(id);e.value='';e.classList&&e.classList.remove('err');});
-  g('f-oy').value='';g('f-sinf').value='';
-}
-function bl(btnId,spId,txtId,loading,txt){
-  if(btnId) g(btnId).disabled=loading;
-  g(spId).style.display=loading?'inline-block':'none';
-  g(txtId).textContent=txt;
-}
-function g(id){return document.getElementById(id);}
-function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
-function fDate(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?v:d.toLocaleDateString('uz-UZ');}
-function fTug(v){
-  if(!v)return '—';
-  const s=String(v);
-  if(s.match(/^\d{4}-\d{2}-\d{2}/)||s.includes('T')){const d=new Date(s);if(!isNaN(d))return d.toLocaleDateString('uz-UZ');}
-  return s.length>=4?s.substring(0,4):s;
-}
-let toastT;
-function toast(msg,type=''){
-  const t=g('toast');t.textContent=msg;t.className='toast show '+type;
-  clearTimeout(toastT);toastT=setTimeout(()=>{t.className='toast';},3000);
-}
-</script>
+<script src="js/app.js"></script>
 </body>
 </html>
