@@ -380,7 +380,7 @@ function renderAdmins(admins) {
     <div class="admin-item">
       <div class="admin-info">
         <span class="admin-name">${a.ism}</span>
-        <span class="admin-email">${a.username}</span>
+        <span class="admin-email">👤 ${a.username}</span>
         <span class="admin-ptag">🔑 ${a.parol || '—'}</span>
       </div>
       <div class="admin-acts">
