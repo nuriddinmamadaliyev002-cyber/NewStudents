@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 // ─────────────────────────────────────────────
 async function doLogin() {
   const username = g('inp-username').value.trim();
-  const parol    = g('inp-parol').value;
+  const parol    = g('inp-parol').value.trim();
   if (!username || !parol) return;
 
   const btn = g('login-btn');
