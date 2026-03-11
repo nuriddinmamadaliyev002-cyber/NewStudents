@@ -623,13 +623,11 @@ function esc(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); 
 
 function fDate(v) {
   if (!v) return '—';
-  const s = String(v);
-  if (s.match(/^\d{4}-\d{2}-\d{2}/)) {
-    const d = new Date(s + 'T00:00:00');
-    return isNaN(d) ? s : d.toLocaleDateString('uz-UZ');
-  }
-  const d = new Date(v);
-  return isNaN(d) ? v : d.toLocaleDateString('uz-UZ');
+  const s = String(v).trim();
+  if (!s || s === 'undefined' || s === 'null') return '—';
+  const d = new Date(s);
+  if (!isNaN(d)) return d.toLocaleDateString('uz-UZ');
+  return s;
 }
 
 function fTug(v) {
